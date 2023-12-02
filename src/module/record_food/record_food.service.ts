@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { GetModel } from './models/get.model';
 import { PostModel } from './models/post.model';
 import { PutModel } from './models/put.model';
 
@@ -10,9 +9,9 @@ export class RecordFoodService {
 		private readonly PostModel: PostModel, // private readonly PutModel: PutModel,
 	) {}
 
-	async recordFood(params, uid) {
+	async storeRecordFood(params, uid) {
 		try {
-			const user = await this.PostModel.storeWaterById({ params, uid });
+			const user = await this.PostModel.storeRecordFood({ params, uid });
 			return user;
 		} catch (error) {
 			throw error;

@@ -28,7 +28,7 @@ export class RecordFoodController {
 		@Body() params: CreateRecordFoodDto,
 		@Headers('fona-client-uid') uid: string,
 	) {
-		const data = await this.recordFoodService.recordFood(params, uid);
+		const data = await this.recordFoodService.storeRecordFood(params, uid);
 		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_CREATE, data);
 	}
 

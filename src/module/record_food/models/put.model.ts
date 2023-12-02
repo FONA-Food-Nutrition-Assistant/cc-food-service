@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RecordWaterEntity } from '../entities/record_food.entity';
+import { RecordFoodEntity } from '../entities/record_food.entity';
 import { error } from 'console';
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
@@ -9,8 +9,8 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 @Injectable()
 export class PutModel {
 	constructor(
-		@InjectRepository(RecordWaterEntity)
-		private readonly WaterRepository: Repository<RecordWaterEntity>,
+		@InjectRepository(RecordFoodEntity)
+		private readonly WaterRepository: Repository<RecordFoodEntity>,
 	) {}
 
 	async updateWaterById({ params, uid }) {
@@ -22,7 +22,7 @@ export class PutModel {
 
 			if (!checker) {
 				throw new HttpException(
-					ResponseMessage.ERR_WATER_DATA_HAS_NOT_BEEN_REGISTERED,
+					ResponseMessage.ERR_FOOD_DATA_HAS_NOT_BEEN_REGISTERED,
 					HttpStatus.BAD_REQUEST,
 				);
 			}
