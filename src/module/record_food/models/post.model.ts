@@ -10,12 +10,12 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 export class PostModel {
 	constructor(
 		@InjectRepository(RecordFoodEntity)
-		private readonly FoodRepository: Repository<RecordFoodEntity>,
+		private readonly RecordFoodRepository: Repository<RecordFoodEntity>,
 	) {}
 
 	async storeRecordFood({ params, uid }) {
 		try {
-			const checker = await this.FoodRepository.createQueryBuilder('food')
+			const checker = await this.RecordFoodRepository.createQueryBuilder('food')
 				.where('user_id = :uid', { uid: uid })
 				.where('date = :date', { date: params.date })
 				.getRawOne();
@@ -27,25 +27,34 @@ export class PostModel {
 				);
 			}
 
-			const food = {
-				user_id: uid,
-				number_of_cups: params.number_of_cups,
-				date: params.date,
-				created_at: new Date().toISOString().split('T')[0],
-				updated_at: new Date().toISOString().split('T')[0],
-			};
+			let user_food: Object;
 
-			const result = await this.FoodRepository.createQueryBuilder()
-				.insert()
-				.values(food)
-				.returning('id')
-				.execute()
-				.catch(error => {
+			const recordFoodRepo = this.RecordFoodRepository; // Assign the repository to a variable
+
+			params.foods.forEach(async function(food, i) {
+
+				user_food = {
+					user_id: uid,
+					food_id: food.food_id,
+					quantity: food.quantity,
+					date: params.date,
+					created_at: new Date().toISOString().split('T')[0],
+					updated_at: new Date().toISOString().split('T')[0],
+				};
+
+				try {
+					await recordFoodRepo.createQueryBuilder()
+                    .insert()
+                    .values(user_food)
+                    .execute();
+				} catch (error) {
 					console.error('Error while inserting:', error);
-					throw error; // Rethrow the error to handle it where the function is called
-				});
+                	throw error; // Rethrow the error to handle it where the function is called
+				}
+			});
 
-			return result;
+			return "User foods has been successfuly registered!";
+			
 		} catch (error) {
 			throw error;
 		}

@@ -17,7 +17,10 @@ export class RecordFoodEntity {
 	user_id: string;
 
 	@Column({ type: 'int', nullable: false })
-	number_of_cups: number;
+	food_id: number;
+	
+	@Column({ type: 'int', nullable: false })
+	quantity: number;
 
 	@Column({ type: 'date', nullable: false })
 	date: Date;

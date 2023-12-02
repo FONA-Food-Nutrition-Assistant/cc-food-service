@@ -18,12 +18,12 @@ export class RecordFoodService {
 		}
 	}
 
-	// async updateWaterById(params, uid) {
-	// 	try {
-	// 		const user = await this.PutModel.updateWaterById({ params, uid });
-	// 		return user;
-	// 	} catch (error) {
-	// 		throw error;
-	// 	}
-	// }
+	async updateRecordFood(params, uid) {
+		try {
+			const user = await this.PutModel.updateRecordFood({ params, uid });
+			return user;
+		} catch (error) {
+			throw error;
+		}
+	}
 }

@@ -1,9 +1,9 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { FoodDto } from './food.dto';
 
 export class CreateRecordFoodDto {
 	@IsNotEmpty()
-	@IsNumber()
-	number_of_cups: number;
+	foods: FoodDto[]
 
 	@IsNotEmpty()
 	@IsString()

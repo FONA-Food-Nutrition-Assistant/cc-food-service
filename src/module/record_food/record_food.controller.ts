@@ -32,12 +32,12 @@ export class RecordFoodController {
 		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_CREATE, data);
 	}
 
-	// @Put()
-	// async updateWater(
-	// 	@Body() params: UpdateRecordFoodDto,
-	// 	@Headers('fona-client-uid') uid: string,
-	// ) {
-	// 	const data = await this.waterService.updateWaterById(params, uid);
-	// 	return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_CREATE, data);
-	// }
+	@Put()
+	async updateWater(
+		@Body() params: UpdateRecordFoodDto,
+		@Headers('fona-client-uid') uid: string,
+	) {
+		const data = await this.recordFoodService.updateRecordFood(params, uid);
+		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_CREATE, data);
+	}
 }

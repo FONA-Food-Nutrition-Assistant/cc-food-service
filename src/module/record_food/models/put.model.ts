@@ -10,40 +10,61 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 export class PutModel {
 	constructor(
 		@InjectRepository(RecordFoodEntity)
-		private readonly WaterRepository: Repository<RecordFoodEntity>,
+		private readonly RecordFoodRepository: Repository<RecordFoodEntity>,
 	) {}
 
-	async updateWaterById({ params, uid }) {
+	async updateRecordFood({ params, uid }) {
 		try {
-			const checker = await this.WaterRepository.createQueryBuilder('water')
-				.where('user_id = :uid', { uid: uid })
-				.where('date = :date', { date: params.date })
-				.getRawOne();
+			await this.RecordFoodRepository.createQueryBuilder()
+			.delete()
+			.from(RecordFoodEntity)
+			.where("user_id = :id", { id: uid })
+			.where("date = :date", { date: params.date })
+			.execute()
 
-			if (!checker) {
-				throw new HttpException(
-					ResponseMessage.ERR_FOOD_DATA_HAS_NOT_BEEN_REGISTERED,
-					HttpStatus.BAD_REQUEST,
-				);
-			}
+			let user_food: Object;
 
-			const updatedData = {
-				...params,
-				updated_at: new Date().toISOString().split('T')[0],
-			};
+			const recordFoodRepo = this.RecordFoodRepository; // Assign the repository to a variable
 
-			const result = await this.WaterRepository.createQueryBuilder()
-				.update()
-				.set(updatedData)
-				.where('uid = :uid', { uid: uid })
-				.where('date = :date', { date: params.date })
-				.execute()
-				.catch(error => {
-					console.error('Error while updating:', error);
-					throw error; // Rethrow the error to handle it where the function is called
-				});
+			params.foods.forEach(async function(food, i) {
 
-			return result;
+				user_food = {
+					user_id: uid,
+					food_id: food.food_id,
+					quantity: food.quantity,
+					date: params.date,
+					created_at: new Date().toISOString().split('T')[0], // ini karena sistemnya delete dan update, jadi di reset
+					updated_at: new Date().toISOString().split('T')[0],
+				};
+
+				try {
+					user_food = {
+						user_id: uid,
+						food_id: food.food_id,
+						quantity: food.quantity,
+						date: params.date,
+						created_at: new Date().toISOString().split('T')[0],
+						updated_at: new Date().toISOString().split('T')[0],
+					};
+	
+					try {
+						await recordFoodRepo.createQueryBuilder()
+						.insert()
+						.values(user_food)
+						.execute();
+					} catch (error) {
+						console.error('Error while inserting:', error);
+						throw error; // Rethrow the error to handle it where the function is called
+					}
+
+				} catch (error) {
+					console.error('Error while inserting:', error);
+                	throw error; // Rethrow the error to handle it where the function is called
+				}
+			});
+
+			return "User foods has been successfuly updated!";
+			
 		} catch (error) {
 			throw error;
 		}
