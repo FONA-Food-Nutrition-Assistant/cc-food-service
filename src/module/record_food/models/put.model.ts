@@ -63,7 +63,7 @@ export class PutModel {
 				}
 			});
 
-			return "User foods has been successfuly updated!";
+			return "User daily foods information has been successfuly updated!";
 			
 		} catch (error) {
 			throw error;

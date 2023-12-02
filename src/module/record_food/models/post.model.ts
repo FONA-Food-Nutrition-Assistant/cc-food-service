@@ -53,7 +53,7 @@ export class PostModel {
 				}
 			});
 
-			return "User foods has been successfuly registered!";
+			return "User daily foods information has been successfuly registered!";
 			
 		} catch (error) {
 			throw error;
