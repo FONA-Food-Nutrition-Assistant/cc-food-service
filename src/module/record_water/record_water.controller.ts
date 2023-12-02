@@ -20,24 +20,24 @@ import { CreateRecordWaterDto } from './dto/create-record_water.dto';
 import { UpdateRecordWaterDto } from './dto/update-record_water.dto';
 
 @Controller('water')
-export class WaterController {
-	constructor(private readonly waterService: RecordWaterService) {}
+export class RecordWaterController {
+	constructor(private readonly recordWaterService: RecordWaterService) {}
 
 	@Post()
 	async storeWater(
 		@Body() params: CreateRecordWaterDto,
 		@Headers('fona-client-uid') uid: string,
 	) {
-		const data = await this.waterService.storeWaterById(params, uid);
+		const data = await this.recordWaterService.storeWaterById(params, uid);
 		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_CREATE, data);
 	}
 
 	@Put()
 	async updateWater(
-		@Body() params: CreateRecordWaterDto,
+		@Body() params: UpdateRecordWaterDto,
 		@Headers('fona-client-uid') uid: string,
 	) {
-		const data = await this.waterService.updateWaterById(params, uid);
+		const data = await this.recordWaterService.updateWaterById(params, uid);
 		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_CREATE, data);
 	}
 }

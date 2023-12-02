@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { WaterController } from './record_water.controller';
+import { RecordWaterController } from './record_water.controller';
 import { RecordWaterService } from './record_water.service';
 import { GetModel } from './models/get.model';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -9,7 +9,7 @@ import { PutModel } from './models/put.model';
 
 @Module({
 	imports: [TypeOrmModule.forFeature([RecordWaterEntity])],
-	controllers: [WaterController],
+	controllers: [RecordWaterController],
 	providers: [
 		/** Services */
 		RecordWaterService,
