@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class CreateWaterDto {
+export class CreateRecordWaterDto {
 	@IsNotEmpty()
 	@IsNumber()
 	number_of_cups: number;

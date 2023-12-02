@@ -1,18 +1,18 @@
 import { Module } from '@nestjs/common';
-import { WaterController } from './water.controller';
-import { WaterService } from './water.service';
+import { WaterController } from './record_water.controller';
+import { RecordWaterService } from './record_water.service';
 import { GetModel } from './models/get.model';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { WaterEntity } from './entities/water.entity';
+import { RecordWaterEntity } from './entities/record_water.entity';
 import { PostModel } from './models/post.model';
 import { PutModel } from './models/put.model';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([WaterEntity])],
+	imports: [TypeOrmModule.forFeature([RecordWaterEntity])],
 	controllers: [WaterController],
 	providers: [
 		/** Services */
-		WaterService,
+		RecordWaterService,
 
 		/** Models */
 		GetModel,
@@ -20,4 +20,4 @@ import { PutModel } from './models/put.model';
 		PutModel,
 	],
 })
-export class WaterModule {}
+export class RecordWaterModule {}

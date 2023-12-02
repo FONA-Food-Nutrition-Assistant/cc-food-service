@@ -13,19 +13,19 @@ import {
 /* Other Dependencies */
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { TidyResponse } from 'src/util/responseHelper';
-import { WaterService } from './water.service';
+import { RecordWaterService } from './record_water.service';
 
 /* DTO */
-import { CreateWaterDto } from './dto/create-water.dto';
-import { UpdateWaterDto } from './dto/update-water.dto';
+import { CreateRecordWaterDto } from './dto/create-record_water.dto';
+import { UpdateRecordWaterDto } from './dto/update-record_water.dto';
 
 @Controller('water')
 export class WaterController {
-	constructor(private readonly waterService: WaterService) {}
+	constructor(private readonly waterService: RecordWaterService) {}
 
 	@Post()
 	async storeWater(
-		@Body() params: CreateWaterDto,
+		@Body() params: CreateRecordWaterDto,
 		@Headers('fona-client-uid') uid: string,
 	) {
 		const data = await this.waterService.storeWaterById(params, uid);
@@ -34,7 +34,7 @@ export class WaterController {
 
 	@Put()
 	async updateWater(
-		@Body() params: CreateWaterDto,
+		@Body() params: CreateRecordWaterDto,
 		@Headers('fona-client-uid') uid: string,
 	) {
 		const data = await this.waterService.updateWaterById(params, uid);

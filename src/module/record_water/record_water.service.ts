@@ -4,7 +4,7 @@ import { PostModel } from './models/post.model';
 import { PutModel } from './models/put.model';
 
 @Injectable()
-export class WaterService {
+export class RecordWaterService {
 	constructor(
 		private readonly PutModel: PutModel,
 		private readonly PostModel: PostModel, // private readonly PutModel: PutModel,

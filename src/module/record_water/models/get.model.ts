@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { WaterEntity } from '../entities/water.entity';
+import { RecordWaterEntity } from '../entities/record_water.entity';
 import { error } from 'console';
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
@@ -9,8 +9,8 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 @Injectable()
 export class GetModel {
 	constructor(
-		@InjectRepository(WaterEntity)
-		private readonly WaterRepository: Repository<WaterEntity>,
+		@InjectRepository(RecordWaterEntity)
+		private readonly WaterRepository: Repository<RecordWaterEntity>,
 	) {}
 
 	async getWaterById(uid) {
