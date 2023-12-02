@@ -10,6 +10,9 @@ export enum ResponseMessage {
 	ERR_CREATE = 'Failed to create data',
 	ERR_UPDATE = 'Failed to update data',
 	ERR_DELETE = 'Failed to delete data',
+	ERR_USER_NOT_FOUND = 'Failed to get user data. User not found!',
+	ERR_WATER_DATA_HAS_BEEN_REGISTERED = `Failed to store user's water data as the data has been registered. Please use PUT method instead!`,
+	ERR_WATER_DATA_HAS_NOT_BEEN_REGISTERED = `Failed to update user's water data as the data has not been registered. Please use POST method instead!`,
 
 	// Server Error
 	ERR_INTERNAL_SERVER_ERROR = 'Internal server error',
