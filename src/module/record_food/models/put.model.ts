@@ -16,18 +16,17 @@ export class PutModel {
 	async updateRecordFood({ params, uid }) {
 		try {
 			await this.RecordFoodRepository.createQueryBuilder()
-			.delete()
-			.from(RecordFoodEntity)
-			.where("user_id = :id", { id: uid })
-			.where("date = :date", { date: params.date })
-			.execute()
+				.delete()
+				.from(RecordFoodEntity)
+				.where('user_id = :id', { id: uid })
+				.where('date = :date', { date: params.date })
+				.execute();
 
 			let user_food: Object;
 
 			const recordFoodRepo = this.RecordFoodRepository; // Assign the repository to a variable
 
-			params.foods.forEach(async function(food, i) {
-
+			params.foods.forEach(async function (food, i) {
 				user_food = {
 					user_id: uid,
 					food_id: food.food_id,
@@ -43,28 +42,25 @@ export class PutModel {
 						food_id: food.food_id,
 						quantity: food.quantity,
 						date: params.date,
-						created_at: new Date().toISOString().split('T')[0],
-						updated_at: new Date().toISOString().split('T')[0],
 					};
-	
+
 					try {
-						await recordFoodRepo.createQueryBuilder()
-						.insert()
-						.values(user_food)
-						.execute();
+						await recordFoodRepo
+							.createQueryBuilder()
+							.insert()
+							.values(user_food)
+							.execute();
 					} catch (error) {
 						console.error('Error while inserting:', error);
 						throw error; // Rethrow the error to handle it where the function is called
 					}
-
 				} catch (error) {
 					console.error('Error while inserting:', error);
-                	throw error; // Rethrow the error to handle it where the function is called
+					throw error; // Rethrow the error to handle it where the function is called
 				}
 			});
 
-			return "User daily foods information has been successfuly updated!";
-			
+			return 'User daily foods information has been successfuly updated!';
 		} catch (error) {
 			throw error;
 		}
