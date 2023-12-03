@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { GetModel } from './models/get.model';
 import { PostModel } from './models/post.model';
 import { PutModel } from './models/put.model';
 

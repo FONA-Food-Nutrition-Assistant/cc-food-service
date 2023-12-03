@@ -16,8 +16,8 @@ export class PutModel {
 	async updateWaterById({ params, uid }) {
 		try {
 			const checker = await this.WaterRepository.createQueryBuilder('water')
-				.where('user_id = :uid', { uid: uid })
-				.where('date = :date', { date: params.date })
+				.andWhere('user_id = :uid', { uid: uid })
+				.andWhere('date = :date', { date: params.date })
 				.getRawOne();
 
 			if (!checker) {
@@ -34,8 +34,8 @@ export class PutModel {
 			const result = await this.WaterRepository.createQueryBuilder()
 				.update()
 				.set(updatedData)
-				.where('uid = :uid', { uid: uid })
-				.where('date = :date', { date: params.date })
+				.where('user_id = :uid', { uid: uid })
+				.andWhere('date = :date', { date: params.date })
 				.execute()
 				.catch(error => {
 					console.error('Error while updating:', error);
