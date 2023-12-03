@@ -18,12 +18,15 @@ export class RecordFoodEntity {
 
 	@Column({ type: 'int', nullable: false })
 	food_id: number;
-	
+
 	@Column({ type: 'int', nullable: false })
 	quantity: number;
 
 	@Column({ type: 'date', nullable: false })
 	date: Date;
+
+	@Column({ type: 'varchar', length: 255, nullable: false })
+	meal_time: string;
 
 	@Column({ type: 'date' })
 	created_at: Date;

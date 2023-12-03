@@ -15,11 +15,25 @@ export class PutModel {
 
 	async updateRecordFood({ params, uid }) {
 		try {
+			const checker = await this.RecordFoodRepository.createQueryBuilder('food')
+				.where('user_id = :uid', { uid: uid })
+				.andWhere('date = :date', { date: params.date })
+				.andWhere('meal_time = :meal_time', { meal_time: params.meal_time })
+				.getRawOne();
+
+			if (!checker) {
+				throw new HttpException(
+					ResponseMessage.ERR_FOOD_DATA_HAS_NOT_BEEN_REGISTERED,
+					HttpStatus.BAD_REQUEST,
+				);
+			}
+
 			await this.RecordFoodRepository.createQueryBuilder()
 				.delete()
 				.from(RecordFoodEntity)
 				.where('user_id = :id', { id: uid })
-				.where('date = :date', { date: params.date })
+				.andWhere('date = :date', { date: params.date })
+				.andWhere('meal_time = :meal_time', { meal_time: params.meal_time })
 				.execute();
 
 			let user_food: Object;
@@ -33,6 +47,7 @@ export class PutModel {
 						food_id: food.food_id,
 						quantity: food.quantity,
 						date: params.date,
+						meal_time: params.meal_time,
 					};
 
 					try {
