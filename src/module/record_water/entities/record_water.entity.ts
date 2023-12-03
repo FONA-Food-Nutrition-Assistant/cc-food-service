@@ -21,10 +21,4 @@ export class RecordWaterEntity {
 
 	@Column({ type: 'date', nullable: false })
 	date: Date;
-
-	@Column({ type: 'date' })
-	created_at: Date;
-
-	@Column({ type: 'date' })
-	updated_at: Date;
 }

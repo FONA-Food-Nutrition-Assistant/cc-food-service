@@ -31,8 +31,6 @@ export class PostModel {
 				user_id: uid,
 				number_of_cups: params.number_of_cups,
 				date: params.date,
-				created_at: new Date().toISOString().split('T')[0],
-				updated_at: new Date().toISOString().split('T')[0],
 			};
 
 			const result = await this.WaterRepository.createQueryBuilder()
