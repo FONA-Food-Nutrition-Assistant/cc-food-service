@@ -29,7 +29,6 @@ export class PutModel {
 
 			const updatedData = {
 				...params,
-				updated_at: new Date().toISOString().split('T')[0],
 			};
 
 			const result = await this.WaterRepository.createQueryBuilder()
