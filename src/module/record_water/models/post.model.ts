@@ -17,7 +17,7 @@ export class PostModel {
 		try {
 			const checker = await this.WaterRepository.createQueryBuilder('water')
 				.where('user_id = :uid', { uid: uid })
-				.where('date = :date', { date: params.date })
+				.andWhere('date = :date', { date: params.date })
 				.getRawOne();
 
 			if (checker) {
