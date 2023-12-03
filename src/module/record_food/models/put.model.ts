@@ -27,15 +27,6 @@ export class PutModel {
 			const recordFoodRepo = this.RecordFoodRepository; // Assign the repository to a variable
 
 			params.foods.forEach(async function (food, i) {
-				user_food = {
-					user_id: uid,
-					food_id: food.food_id,
-					quantity: food.quantity,
-					date: params.date,
-					created_at: new Date().toISOString().split('T')[0], // ini karena sistemnya delete dan update, jadi di reset
-					updated_at: new Date().toISOString().split('T')[0],
-				};
-
 				try {
 					user_food = {
 						user_id: uid,
