@@ -1,9 +1,13 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsEnum, IsString } from 'class-validator';
 import { FoodDto } from './food.dto';
-
+import { Mealtime } from 'src/common/enum/meal_time.enum';
 export class CreateRecordFoodDto {
 	@IsNotEmpty()
-	foods: FoodDto[]
+	foods: FoodDto[];
+
+	@IsNotEmpty()
+	@IsEnum(Mealtime)
+	meal_time: string;
 
 	@IsNotEmpty()
 	@IsString()

@@ -17,7 +17,8 @@ export class PostModel {
 		try {
 			const checker = await this.RecordFoodRepository.createQueryBuilder('food')
 				.where('user_id = :uid', { uid: uid })
-				.where('date = :date', { date: params.date })
+				.andWhere('date = :date', { date: params.date })
+				.andWhere('meal_time = :meal_time', { meal_time: params.meal_time })
 				.getRawOne();
 
 			if (checker) {
@@ -37,6 +38,7 @@ export class PostModel {
 					food_id: food.food_id,
 					quantity: food.quantity,
 					date: params.date,
+					meal_time: params.meal_time,
 				};
 
 				try {
