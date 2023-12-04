@@ -11,8 +11,8 @@ export class FoodService {
 
 	async storeFood(params, uid) {
 		try {
-			const user = await this.PostModel.storeFood({ params, uid });
-			return user;
+			const data = await this.PostModel.storeFood({ params, uid });
+			return data;
 		} catch (error) {
 			throw error;
 		}
@@ -20,8 +20,8 @@ export class FoodService {
 
 	async updateFood(params, uid) {
 		try {
-			const user = await this.PutModel.updateFood({ params, uid });
-			return user;
+			const data = await this.PutModel.updateFood({ params, uid });
+			return data;
 		} catch (error) {
 			throw error;
 		}
