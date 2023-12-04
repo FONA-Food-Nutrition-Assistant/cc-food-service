@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RecordFoodEntity } from '../entities/record_food.entity';
+import { FoodEntity } from '../entities/food.entity';
 import { error } from 'console';
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
@@ -9,13 +9,13 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 @Injectable()
 export class PostModel {
 	constructor(
-		@InjectRepository(RecordFoodEntity)
-		private readonly RecordFoodRepository: Repository<RecordFoodEntity>,
+		@InjectRepository(FoodEntity)
+		private readonly FoodRepository: Repository<FoodEntity>,
 	) {}
 
-	async storeRecordFood({ params, uid }) {
+	async storeFood({ params, uid }) {
 		try {
-			const checker = await this.RecordFoodRepository.createQueryBuilder('food')
+			const checker = await this.FoodRepository.createQueryBuilder('food')
 				.where('user_id = :uid', { uid: uid })
 				.andWhere('date = :date', { date: params.date })
 				.andWhere('meal_time = :meal_time', { meal_time: params.meal_time })
@@ -30,7 +30,7 @@ export class PostModel {
 
 			let user_food: Object;
 
-			const recordFoodRepo = this.RecordFoodRepository; // Assign the repository to a variable
+			const foodRepo = this.FoodRepository;
 
 			params.foods.forEach(async function (food, i) {
 				user_food = {
@@ -42,7 +42,7 @@ export class PostModel {
 				};
 
 				try {
-					await recordFoodRepo
+					await foodRepo
 						.createQueryBuilder()
 						.insert()
 						.values(user_food)

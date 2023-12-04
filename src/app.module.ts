@@ -5,12 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import config from './config/global.config';
 import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
-import { RecordFoodModule } from './module/record_food/record_food.module';
+import { FoodModule } from './module/food/food.module';
 
 @Module({
 	imports: [
 		/** App Modules */
-		RecordFoodModule,
+		FoodModule,
 
 		/** Configuration Modules  */
 		ConfigModule.forRoot({

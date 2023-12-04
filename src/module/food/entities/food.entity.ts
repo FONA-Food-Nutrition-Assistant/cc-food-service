@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 
 @Entity('user_food')
-export class RecordFoodEntity {
+export class FoodEntity {
 	@PrimaryGeneratedColumn('uuid')
 	@PrimaryColumn()
 	@Index()

@@ -3,24 +3,24 @@ import { PostModel } from './models/post.model';
 import { PutModel } from './models/put.model';
 
 @Injectable()
-export class RecordFoodService {
+export class FoodService {
 	constructor(
 		private readonly PutModel: PutModel,
 		private readonly PostModel: PostModel, // private readonly PutModel: PutModel,
 	) {}
 
-	async storeRecordFood(params, uid) {
+	async storeFood(params, uid) {
 		try {
-			const user = await this.PostModel.storeRecordFood({ params, uid });
+			const user = await this.PostModel.storeFood({ params, uid });
 			return user;
 		} catch (error) {
 			throw error;
 		}
 	}
 
-	async updateRecordFood(params, uid) {
+	async updateFood(params, uid) {
 		try {
-			const user = await this.PutModel.updateRecordFood({ params, uid });
+			const user = await this.PutModel.updateFood({ params, uid });
 			return user;
 		} catch (error) {
 			throw error;

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RecordFoodEntity } from '../entities/record_food.entity';
+import { FoodEntity } from '../entities/food.entity';
 import { error } from 'console';
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
@@ -9,13 +9,13 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 @Injectable()
 export class PutModel {
 	constructor(
-		@InjectRepository(RecordFoodEntity)
-		private readonly RecordFoodRepository: Repository<RecordFoodEntity>,
+		@InjectRepository(FoodEntity)
+		private readonly FoodRepository: Repository<FoodEntity>,
 	) {}
 
-	async updateRecordFood({ params, uid }) {
+	async updateFood({ params, uid }) {
 		try {
-			const checker = await this.RecordFoodRepository.createQueryBuilder('food')
+			const checker = await this.FoodRepository.createQueryBuilder('food')
 				.where('user_id = :uid', { uid: uid })
 				.andWhere('date = :date', { date: params.date })
 				.andWhere('meal_time = :meal_time', { meal_time: params.meal_time })
@@ -28,9 +28,9 @@ export class PutModel {
 				);
 			}
 
-			await this.RecordFoodRepository.createQueryBuilder()
+			await this.FoodRepository.createQueryBuilder()
 				.delete()
-				.from(RecordFoodEntity)
+				.from(FoodEntity)
 				.where('user_id = :id', { id: uid })
 				.andWhere('date = :date', { date: params.date })
 				.andWhere('meal_time = :meal_time', { meal_time: params.meal_time })
@@ -38,7 +38,7 @@ export class PutModel {
 
 			let user_food: Object;
 
-			const recordFoodRepo = this.RecordFoodRepository; // Assign the repository to a variable
+			const foodRepo = this.FoodRepository; // Assign the repository to a variable
 
 			params.foods.forEach(async function (food, i) {
 				try {
@@ -51,7 +51,7 @@ export class PutModel {
 					};
 
 					try {
-						await recordFoodRepo
+						await foodRepo
 							.createQueryBuilder()
 							.insert()
 							.values(user_food)

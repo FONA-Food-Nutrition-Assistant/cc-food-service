@@ -1,11 +1,11 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateRecordFoodDto } from './create-record_food.dto';
+import { CreateFoodDto } from './create-food.dto';
 import { FoodDto } from './food.dto';
 
 import { IsNotEmpty, IsString, IsEnum } from 'class-validator';
 import { Mealtime } from 'src/common/enum/meal_time.enum';
 
-export class UpdateRecordFoodDto extends PartialType(CreateRecordFoodDto) {
+export class UpdateFoodDto extends PartialType(CreateFoodDto) {
 	@IsNotEmpty()
 	foods: FoodDto[];
 
