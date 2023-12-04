@@ -1,5 +1,4 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { ExampleModule } from './module/example/example.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -10,7 +9,6 @@ import { RequestLoggerMiddleware } from './common/middleware/request-logger.midd
 @Module({
 	imports: [
 		/** App Modules */
-		ExampleModule,
 
 		/** Configuration Modules  */
 		ConfigModule.forRoot({
