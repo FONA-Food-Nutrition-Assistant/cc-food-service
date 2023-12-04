@@ -6,14 +6,12 @@ import { ConfigModule } from '@nestjs/config';
 import config from './config/global.config';
 import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
 import { UidCheckerMiddleware } from './common/middleware/uid-checker.middleware';
-import { RecordFoodModule } from './module/record_food/record_food.module';
 import { WaterModule } from './module/water/water.module';
 
 @Module({
 	imports: [
 		/** App Modules */
 		WaterModule,
-		RecordFoodModule,
 
 		/** Configuration Modules  */
 		ConfigModule.forRoot({
