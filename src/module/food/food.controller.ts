@@ -40,7 +40,7 @@ export class FoodController {
 		@Headers('fona-client-uid') uid: string,
 	) {
 		const data = await this.foodService.storeFood(params, uid);
-		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_CREATE, data);
+		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_CREATE, []);
 	}
 
 	@Put()
