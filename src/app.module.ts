@@ -5,10 +5,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import config from './config/global.config';
 import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
+import { UidCheckerMiddleware } from './common/middleware/uid-checker.middleware';
+import { WaterModule } from './module/water/water.module';
+import { FoodModule } from './module/food/food.module';
 
 @Module({
 	imports: [
 		/** App Modules */
+		WaterModule,
+		FoodModule,
 
 		/** Configuration Modules  */
 		ConfigModule.forRoot({
@@ -37,5 +42,6 @@ import { RequestLoggerMiddleware } from './common/middleware/request-logger.midd
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
 		consumer.apply(RequestLoggerMiddleware).forRoutes('*');
+		consumer.apply(UidCheckerMiddleware).forRoutes('*');
 	}
 }
