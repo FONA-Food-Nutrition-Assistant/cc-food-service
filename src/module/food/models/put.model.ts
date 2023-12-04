@@ -40,7 +40,7 @@ export class PutModel {
 
 			const foodRepo = this.FoodRepository; // Assign the repository to a variable
 
-			params.foods.forEach(async function (food, i) {
+			params.foods.forEach(async function (food) {
 				try {
 					user_food = {
 						user_id: uid,
