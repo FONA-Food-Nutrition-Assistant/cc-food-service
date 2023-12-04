@@ -13,31 +13,31 @@ import {
 /* Other Dependencies */
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { TidyResponse } from 'src/util/responseHelper';
-import { RecordWaterService } from './record_water.service';
+import { WaterService } from './water.service';
 
 /* DTO */
-import { CreateRecordWaterDto } from './dto/create-record_water.dto';
-import { UpdateRecordWaterDto } from './dto/update-record_water.dto';
+import { CreateWaterDto } from './dto/create-water.dto';
+import { UpdateWaterDto } from './dto/update-water.dto';
 
 @Controller('water')
-export class RecordWaterController {
-	constructor(private readonly recordWaterService: RecordWaterService) {}
+export class WaterController {
+	constructor(private readonly WaterService: WaterService) {}
 
 	@Post()
 	async storeWater(
-		@Body() params: CreateRecordWaterDto,
+		@Body() params: CreateWaterDto,
 		@Headers('fona-client-uid') uid: string,
 	) {
-		const data = await this.recordWaterService.storeWaterById(params, uid);
+		const data = await this.WaterService.storeWaterById(params, uid);
 		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_CREATE, data);
 	}
 
 	@Put()
 	async updateWater(
-		@Body() params: UpdateRecordWaterDto,
+		@Body() params: UpdateWaterDto,
 		@Headers('fona-client-uid') uid: string,
 	) {
-		const data = await this.recordWaterService.updateWaterById(params, uid);
+		const data = await this.WaterService.updateWaterById(params, uid);
 		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_CREATE, data);
 	}
 }

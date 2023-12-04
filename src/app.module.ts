@@ -7,12 +7,12 @@ import config from './config/global.config';
 import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
 import { UidCheckerMiddleware } from './common/middleware/uid-checker.middleware';
 import { RecordFoodModule } from './module/record_food/record_food.module';
-import { RecordWaterModule } from './module/record_water/record_water.module';
+import { WaterModule } from './module/water/water.module';
 
 @Module({
 	imports: [
 		/** App Modules */
-		RecordWaterModule,
+		WaterModule,
 		RecordFoodModule,
 
 		/** Configuration Modules  */
