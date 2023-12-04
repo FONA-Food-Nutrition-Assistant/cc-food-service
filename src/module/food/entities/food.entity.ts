@@ -1,36 +1,11 @@
-import {
-	Column,
-	Entity,
-	Index,
-	PrimaryColumn,
-	PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
-@Entity('user_food')
+@Entity('foods')
 export class FoodEntity {
-	@PrimaryGeneratedColumn('uuid')
 	@PrimaryColumn()
 	@Index()
 	id: number;
 
 	@Column({ type: 'varchar', length: 255, nullable: false })
-	user_id: string;
-
-	@Column({ type: 'int', nullable: false })
-	food_id: number;
-
-	@Column({ type: 'int', nullable: false })
-	quantity: number;
-
-	@Column({ type: 'date', nullable: false })
-	date: Date;
-
-	@Column({ type: 'varchar', length: 255, nullable: false })
-	meal_time: string;
-
-	@Column({ type: 'date' })
-	created_at: Date;
-
-	@Column({ type: 'date' })
-	updated_at: Date;
+	name: string;
 }
