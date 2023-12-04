@@ -1,5 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { RecordWaterModule } from './module/record_water/record_water.module';
+import { WaterModule } from './module/water/water.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,7 +11,7 @@ import { UidCheckerMiddleware } from './common/middleware/uid-checker.middleware
 @Module({
 	imports: [
 		/** App Modules */
-		RecordWaterModule,
+		WaterModule,
 
 		/** Configuration Modules  */
 		ConfigModule.forRoot({

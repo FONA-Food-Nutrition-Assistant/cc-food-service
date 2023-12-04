@@ -6,8 +6,8 @@ import {
 	PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity('record_waters')
-export class RecordWaterEntity {
+@Entity('waters')
+export class WaterEntity {
 	@PrimaryGeneratedColumn('uuid')
 	@PrimaryColumn()
 	@Index()
