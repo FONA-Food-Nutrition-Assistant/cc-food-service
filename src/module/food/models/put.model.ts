@@ -1,16 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { FoodEntity } from '../entities/food.entity';
-import { error } from 'console';
+import { UserFoodEntity } from '../entities/user-food.entity';
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class PutModel {
 	constructor(
-		@InjectRepository(FoodEntity)
-		private readonly FoodRepository: Repository<FoodEntity>,
+		@InjectRepository(UserFoodEntity)
+		private readonly FoodRepository: Repository<UserFoodEntity>,
 	) {}
 
 	async updateFood({ params, uid }) {
@@ -30,7 +29,7 @@ export class PutModel {
 
 			await this.FoodRepository.createQueryBuilder()
 				.delete()
-				.from(FoodEntity)
+				.from(UserFoodEntity)
 				.where('user_id = :id', { id: uid })
 				.andWhere('date = :date', { date: params.date })
 				.andWhere('meal_time = :meal_time', { meal_time: params.meal_time })
@@ -66,7 +65,7 @@ export class PutModel {
 				}
 			});
 
-			return 'User daily foods information has been successfuly updated!';
+			return user_food;
 		} catch (error) {
 			throw error;
 		}
