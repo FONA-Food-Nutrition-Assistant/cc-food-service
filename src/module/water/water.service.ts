@@ -11,8 +11,8 @@ export class WaterService {
 
 	async storeWaterById(params, uid) {
 		try {
-			const user = await this.PostModel.storeWaterById({ params, uid });
-			return user;
+			const data = await this.PostModel.storeWaterById({ params, uid });
+			return data;
 		} catch (error) {
 			throw error;
 		}
@@ -20,8 +20,8 @@ export class WaterService {
 
 	async updateWaterById(params, uid) {
 		try {
-			const user = await this.PutModel.updateWaterById({ params, uid });
-			return user;
+			const data = await this.PutModel.updateWaterById({ params, uid });
+			return data;
 		} catch (error) {
 			throw error;
 		}
