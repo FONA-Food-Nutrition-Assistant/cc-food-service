@@ -42,7 +42,7 @@ export class PutModel {
 					throw error; // Rethrow the error to handle it where the function is called
 				});
 
-			return result;
+			return updatedData;
 		} catch (error) {
 			throw error;
 		}
