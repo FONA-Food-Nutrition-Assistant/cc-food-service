@@ -1,16 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { FoodEntity } from '../entities/food.entity';
-import { error } from 'console';
+import { UserFoodEntity } from '../entities/user-food.entity';
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class PostModel {
 	constructor(
-		@InjectRepository(FoodEntity)
-		private readonly FoodRepository: Repository<FoodEntity>,
+		@InjectRepository(UserFoodEntity)
+		private readonly FoodRepository: Repository<UserFoodEntity>,
 	) {}
 
 	async storeFood({ params, uid }) {
