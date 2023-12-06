@@ -1,8 +1,8 @@
 import { IsDate, IsNotEmpty, IsNumber, isDate } from 'class-validator';
 
-export class FoodDto {
+export class NutritionObjectDto {
 	@IsNotEmpty()
-	foods: FoodDto[];
+	foods: NutritionObjectDto[];
 
 	@IsNotEmpty()
 	@IsNumber()

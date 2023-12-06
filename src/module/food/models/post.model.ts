@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserFoodEntity } from '../entities/user-food.entity';
+import { UserNutritionEntity } from '../entities/user-nutrition.entity';
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class PostModel {
 	constructor(
-		@InjectRepository(UserFoodEntity)
-		private readonly FoodRepository: Repository<UserFoodEntity>,
+		@InjectRepository(UserNutritionEntity)
+		private readonly UserNutritionRepository: Repository<UserNutritionEntity>,
 	) {}
 
 	async storeFood({ params, uid }) {
 		try {
-			const checker = await this.FoodRepository.createQueryBuilder('food')
+			const checker = await this.UserNutritionRepository.createQueryBuilder()
 				.where('user_id = :uid', { uid: uid })
 				.andWhere('date = :date', { date: params.date })
 				.andWhere('meal_time = :meal_time', { meal_time: params.meal_time })
@@ -27,24 +27,30 @@ export class PostModel {
 				);
 			}
 
-			let user_food: Object;
+			let user_nutrition: Object;
 
-			const foodRepo = this.FoodRepository;
+			let data: Object[] = [];
 
-			params.foods.forEach(async function (food, i) {
-				user_food = {
+			const nutritionRepo = this.UserNutritionRepository;
+
+			params.foods.forEach(async function (food) {
+				user_nutrition = {
 					user_id: uid,
-					food_id: food.food_id,
+					nutrition_id: food.nutrition_id,
 					quantity: food.quantity,
 					date: params.date,
 					meal_time: params.meal_time,
 				};
 
+				data.push(user_nutrition);
+
+				console.log(data);
+
 				try {
-					await foodRepo
+					await nutritionRepo
 						.createQueryBuilder()
 						.insert()
-						.values(user_food)
+						.values(user_nutrition)
 						.execute();
 				} catch (error) {
 					console.error('Error while inserting:', error);
@@ -52,7 +58,7 @@ export class PostModel {
 				}
 			});
 
-			return 'User daily foods information has been successfuly registered!';
+			return data;
 		} catch (error) {
 			throw error;
 		}
