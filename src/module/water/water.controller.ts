@@ -38,6 +38,6 @@ export class WaterController {
 		@Headers('fona-client-uid') uid: string,
 	) {
 		const data = await this.WaterService.updateWaterById(params, uid);
-		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_CREATE, data);
+		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_UPDATE, data);
 	}
 }
