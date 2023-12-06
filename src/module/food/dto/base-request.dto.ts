@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { OrderType } from 'src/common/enum/request.enum';
 
 export class BaseRequestDto {
@@ -16,8 +16,10 @@ export class BaseRequestDto {
 	offset: number;
 
 	@IsOptional()
-	@IsString()
-	search: string;
+	@IsArray()
+	@IsString({ each: true })
+	@Transform(o => o.value.split(','))
+	search: any = [];
 
 	@IsOptional()
 	@IsString()
@@ -27,7 +29,10 @@ export class BaseRequestDto {
 	@IsEnum(OrderType)
 	order: OrderType = OrderType.ASC;
 
-	prepParams() {
+	uid: string;
+
+	prepParams(uid: string) {
 		this.offset = (this.page - 1) * this.limit;
+		this.uid = uid;
 	}
 }
