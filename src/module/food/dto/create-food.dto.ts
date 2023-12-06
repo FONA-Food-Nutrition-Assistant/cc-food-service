@@ -1,9 +1,9 @@
 import { IsNotEmpty, IsEnum, IsString } from 'class-validator';
-import { FoodDto } from './food.dto';
+import { NutritionObjectDto } from './nutrition-object.dto';
 import { Mealtime } from 'src/common/enum/meal_time.enum';
 export class CreateFoodDto {
 	@IsNotEmpty()
-	foods: FoodDto[];
+	foods: NutritionObjectDto[];
 
 	@IsNotEmpty()
 	@IsEnum(Mealtime)

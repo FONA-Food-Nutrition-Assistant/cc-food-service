@@ -6,8 +6,8 @@ import {
 	PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity('user_food')
-export class UserFoodEntity {
+@Entity('user_nutrition')
+export class UserNutritionEntity {
 	@PrimaryGeneratedColumn('uuid')
 	@PrimaryColumn()
 	@Index()
@@ -17,7 +17,7 @@ export class UserFoodEntity {
 	user_id: string;
 
 	@Column({ type: 'int', nullable: false })
-	food_id: number;
+	nutrition_id: number;
 
 	@Column({ type: 'int', nullable: false })
 	quantity: number;

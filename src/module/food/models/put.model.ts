@@ -1,20 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserFoodEntity } from '../entities/user-food.entity';
+import { UserNutritionEntity } from '../entities/user-nutrition.entity';
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class PutModel {
 	constructor(
-		@InjectRepository(UserFoodEntity)
-		private readonly FoodRepository: Repository<UserFoodEntity>,
+		@InjectRepository(UserNutritionEntity)
+		private readonly UserNutritionRepository: Repository<UserNutritionEntity>,
 	) {}
 
 	async updateFood({ params, uid }) {
 		try {
-			const checker = await this.FoodRepository.createQueryBuilder('food')
+			const checker = await this.UserNutritionRepository.createQueryBuilder(
+				'food',
+			)
 				.where('user_id = :uid', { uid: uid })
 				.andWhere('date = :date', { date: params.date })
 				.andWhere('meal_time = :meal_time', { meal_time: params.meal_time })
@@ -27,33 +29,39 @@ export class PutModel {
 				);
 			}
 
-			await this.FoodRepository.createQueryBuilder()
+			await this.UserNutritionRepository.createQueryBuilder()
 				.delete()
-				.from(UserFoodEntity)
+				.from(UserNutritionEntity)
 				.where('user_id = :id', { id: uid })
 				.andWhere('date = :date', { date: params.date })
-				.andWhere('meal_time = :meal_time', { meal_time: params.meal_time })
+				.andWhere('meal_time = :meal_time', {
+					meal_time: params.meal_time,
+				})
 				.execute();
 
-			let user_food: Object;
+			let user_nutrition: Object;
 
-			const foodRepo = this.FoodRepository; // Assign the repository to a variable
+			let data: Object[] = [];
+
+			const foodRepo = this.UserNutritionRepository; // Assign the repository to a variable
 
 			params.foods.forEach(async function (food, i) {
 				try {
-					user_food = {
+					user_nutrition = {
 						user_id: uid,
-						food_id: food.food_id,
+						nutrition_id: food.nutrition_id,
 						quantity: food.quantity,
 						date: params.date,
 						meal_time: params.meal_time,
 					};
 
+					data.push(user_nutrition);
+
 					try {
 						await foodRepo
 							.createQueryBuilder()
 							.insert()
-							.values(user_food)
+							.values(user_nutrition)
 							.execute();
 					} catch (error) {
 						console.error('Error while inserting:', error);
@@ -65,7 +73,7 @@ export class PutModel {
 				}
 			});
 
-			return user_food;
+			return data;
 		} catch (error) {
 			throw error;
 		}
