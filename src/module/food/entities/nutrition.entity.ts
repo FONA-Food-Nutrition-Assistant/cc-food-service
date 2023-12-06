@@ -31,7 +31,7 @@ export class NutritionEntity {
 	sodiums: number;
 
 	@Column({ type: 'float', nullable: true })
-	kaliums: number;
+	caliums: number;
 
 	@Column({ type: 'int', nullable: false })
 	food_id: number;
