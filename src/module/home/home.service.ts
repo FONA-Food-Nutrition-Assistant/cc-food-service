@@ -40,14 +40,16 @@ export class HomeService {
 	}
 
 	async calorieIntake(tdee) {
-		const lowestbreakfastIntake = Math.round((30 / 100) * tdee);
-		const highestbreakfastIntake = Math.round((35 / 100) * tdee);
+		const tolerance = 0.01;
 
-		const lowestlunchIntake = Math.round((35 / 100) * tdee);
-		const highestlunchIntake = Math.round((40 / 100) * tdee);
+		const lowestbreakfastIntake = Math.round((0.3 - tolerance) * tdee);
+		const highestbreakfastIntake = Math.round((0.35 + tolerance) * tdee);
 
-		const lowestdinnerIntake = Math.round((25 / 100) * tdee);
-		const highestdinnerIntake = Math.round((35 / 100) * tdee);
+		const lowestlunchIntake = Math.round((0.35 - tolerance) * tdee);
+		const highestlunchIntake = Math.round((0.4 + tolerance) * tdee);
+
+		const lowestdinnerIntake = Math.round((0.25 - tolerance) * tdee);
+		const highestdinnerIntake = Math.round((0.35 + tolerance) * tdee);
 
 		return {
 			lowestbreakfastIntake,
@@ -65,14 +67,14 @@ export class HomeService {
 		try {
 			const user = await this.GetModel.getUserById(uid);
 			let tdee = await this.getTdee(user);
-			// let calorieIntake = await this.calorieIntake(tdee);
+			let calorieIntake = await this.calorieIntake(tdee);
 
-			// const foodsByCaloriesIntake =
-			// 	await this.GetModel.getFoodsBasedCalorieIntake(calorieIntake);
+			const foodsByCaloriesIntake =
+				await this.GetModel.getFoodsBasedCalorieIntake(calorieIntake);
 
-			// return foodsByCaloriesIntake;
+			return foodsByCaloriesIntake;
 
-			// let foodRecommendation = await this.foodRecommendation(tdee);
+			let foodRecommendation = await this.foodRecommendation(tdee);
 
 			const recordedNutrition = await this.GetModel.getRecordedNutrition({
 				date,
@@ -93,11 +95,11 @@ export class HomeService {
 				Mealtime.DINNER,
 			);
 
-			let water = recordedNutrition[0].number_of_cups;
+			// let water = recordedNutrition[0].number_of_cups;
 
-			if (!water) {
-				water = null;
-			}
+			// if (!water) {
+			// 	water = null;
+			// }
 
 			let total_cals: number = 0;
 			let total_carbos: number = 0;
@@ -147,7 +149,7 @@ export class HomeService {
 					dinner,
 				},
 				// foodRecommentation: foodRecommentation,
-				water,
+				// water,
 			};
 		} catch (error) {
 			throw error;
