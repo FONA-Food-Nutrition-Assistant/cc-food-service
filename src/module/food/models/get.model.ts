@@ -3,9 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FoodEntity } from '../entities/food.entity';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { NutritionEntity } from '../entities/nutrition.entity';
+import { UserNutritionEntity } from '../entities/user-nutrition.entity';
 import { BaseRequestDto } from '../dto/base-request.dto';
 import { RequestListFoodDto } from '../dto/list-food.dto';
 import { RequestListNutritionDto } from '../dto/list-nutrition.dto';
+import { FoodAllergyEntity } from '../entities/food-allergy.entity';
+import { UserAllergyEntity } from '../entities/user-allergy.entity';
+import { AllergyEntity } from '../entities/allergy.entity';
 
 @Injectable()
 export class GetModel {
@@ -14,6 +18,8 @@ export class GetModel {
 		private readonly FoodRepository: Repository<FoodEntity>,
 		@InjectRepository(NutritionEntity)
 		private readonly NutritionRepository: Repository<NutritionEntity>,
+		@InjectRepository(UserNutritionEntity)
+		private readonly UserNutritionRepository: Repository<UserNutritionEntity>,
 	) {}
 
 	async getFood(params: RequestListFoodDto): Promise<FoodEntity[]> {
@@ -54,6 +60,29 @@ export class GetModel {
 		let query = this.NutritionRepository.createQueryBuilder('nu')
 			.select('*')
 			.where('nu.food_id IN (:...foodIds)', { foodIds: foodIds });
+		return await query.getRawMany();
+	}
+
+	async checkRegisteredNutrition({ params, uid }) {
+		const query = this.UserNutritionRepository.createQueryBuilder()
+			.where('user_id = :uid', { uid: uid })
+			.andWhere('date = :date', { date: params.date })
+			.andWhere('meal_time = :meal_time', { meal_time: params.meal_time });
+
+		return await query.getRawOne();
+	}
+
+	async checkNutritionsAllergies({ params, uid }) {
+		const query = this.UserNutritionRepository.createQueryBuilder('un')
+			.select('f.name as Food')
+			.leftJoin(NutritionEntity, 'n', 'n.id = un.nutrition_id')
+			.leftJoin(FoodEntity, 'f', 'f.id = n.food_id')
+			.leftJoin(FoodAllergyEntity, 'fa', 'fa.food_id = f.id')
+			.leftJoin(AllergyEntity, 'a', 'a.id = fa.allergy_id')
+			.where('un.user_id = :uid', { uid })
+			.andWhere('un.date = :date', { date: params.date })
+			.andWhere('un.meal_time = :meal_time', { meal_time: params.meal_time });
+
 		return await query.getRawMany();
 	}
 

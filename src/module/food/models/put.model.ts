@@ -13,69 +13,28 @@ export class PutModel {
 	) {}
 
 	async updateFood({ params, uid }) {
-		try {
-			const checker = await this.UserNutritionRepository.createQueryBuilder(
-				'food',
-			)
-				.where('user_id = :uid', { uid: uid })
-				.andWhere('date = :date', { date: params.date })
-				.andWhere('meal_time = :meal_time', { meal_time: params.meal_time })
-				.getRawOne();
+		let user_nutrition: Object;
+		let data: Object[] = [];
+		const nutritionRepo = this.UserNutritionRepository;
 
-			if (!checker) {
-				throw new HttpException(
-					ResponseMessage.ERR_FOOD_DATA_HAS_NOT_BEEN_REGISTERED,
-					HttpStatus.BAD_REQUEST,
-				);
-			}
+		params.foods.forEach(async function (food) {
+			user_nutrition = {
+				user_id: uid,
+				nutrition_id: food.nutrition_id,
+				quantity: food.quantity,
+				date: params.date,
+				meal_time: params.meal_time,
+			};
 
-			await this.UserNutritionRepository.createQueryBuilder()
-				.delete()
-				.from(UserNutritionEntity)
-				.where('user_id = :id', { id: uid })
-				.andWhere('date = :date', { date: params.date })
-				.andWhere('meal_time = :meal_time', {
-					meal_time: params.meal_time,
-				})
+			data.push(user_nutrition);
+
+			await nutritionRepo
+				.createQueryBuilder()
+				.insert()
+				.values(user_nutrition)
 				.execute();
+		});
 
-			let user_nutrition: Object;
-
-			let data: Object[] = [];
-
-			const foodRepo = this.UserNutritionRepository; // Assign the repository to a variable
-
-			params.foods.forEach(async function (food, i) {
-				try {
-					user_nutrition = {
-						user_id: uid,
-						nutrition_id: food.nutrition_id,
-						quantity: food.quantity,
-						date: params.date,
-						meal_time: params.meal_time,
-					};
-
-					data.push(user_nutrition);
-
-					try {
-						await foodRepo
-							.createQueryBuilder()
-							.insert()
-							.values(user_nutrition)
-							.execute();
-					} catch (error) {
-						console.error('Error while inserting:', error);
-						throw error; // Rethrow the error to handle it where the function is called
-					}
-				} catch (error) {
-					console.error('Error while inserting:', error);
-					throw error; // Rethrow the error to handle it where the function is called
-				}
-			});
-
-			return data;
-		} catch (error) {
-			throw error;
-		}
+		return data;
 	}
 }
