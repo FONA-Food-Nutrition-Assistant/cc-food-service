@@ -4,6 +4,8 @@ import {
 	Index,
 	PrimaryColumn,
 	PrimaryGeneratedColumn,
+	ManyToMany,
+	JoinTable,
 } from 'typeorm';
 
 @Entity('user_nutrition')

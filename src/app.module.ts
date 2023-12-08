@@ -8,12 +8,14 @@ import { RequestLoggerMiddleware } from './common/middleware/request-logger.midd
 import { UidCheckerMiddleware } from './common/middleware/uid-checker.middleware';
 import { WaterModule } from './module/water/water.module';
 import { FoodModule } from './module/food/food.module';
+import { HomeModule } from './module/home/home.module';
 
 @Module({
 	imports: [
 		/** App Modules */
 		WaterModule,
 		FoodModule,
+		HomeModule,
 
 		/** Configuration Modules  */
 		ConfigModule.forRoot({
