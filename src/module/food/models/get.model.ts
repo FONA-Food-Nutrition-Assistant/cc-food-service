@@ -10,6 +10,7 @@ import { RequestListNutritionDto } from '../dto/list-nutrition.dto';
 import { FoodAllergyEntity } from '../entities/food-allergy.entity';
 import { UserAllergyEntity } from '../entities/user-allergy.entity';
 import { AllergyEntity } from '../entities/allergy.entity';
+import { RequestUpdateRecordFoodDto } from '../dto/update-record-food.dto';
 
 @Injectable()
 export class GetModel {
@@ -63,25 +64,24 @@ export class GetModel {
 		return await query.getRawMany();
 	}
 
-	async checkRegisteredNutrition({ params, uid }) {
+	async checkRegisteredNutrition(params: RequestUpdateRecordFoodDto) {
 		const query = this.UserNutritionRepository.createQueryBuilder()
-			.where('user_id = :uid', { uid: uid })
+			.where('user_id = :uid', { uid: params.uid })
 			.andWhere('date = :date', { date: params.date })
 			.andWhere('meal_time = :meal_time', { meal_time: params.meal_time });
 
 		return await query.getRawOne();
 	}
 
-	async checkNutritionsAllergies({ params, uid }) {
-		const query = this.UserNutritionRepository.createQueryBuilder('un')
+	async checkNutritionsAllergies(nutritionIds: Array<number>, uid: string) {
+		const query = this.NutritionRepository.createQueryBuilder('n')
 			.select('f.name as Food')
-			.leftJoin(NutritionEntity, 'n', 'n.id = un.nutrition_id')
 			.leftJoin(FoodEntity, 'f', 'f.id = n.food_id')
 			.leftJoin(FoodAllergyEntity, 'fa', 'fa.food_id = f.id')
 			.leftJoin(AllergyEntity, 'a', 'a.id = fa.allergy_id')
-			.where('un.user_id = :uid', { uid })
-			.andWhere('un.date = :date', { date: params.date })
-			.andWhere('un.meal_time = :meal_time', { meal_time: params.meal_time });
+			.leftJoin(UserAllergyEntity, 'ua', 'ua.allergy_id = a.id')
+			.where('ua.user_id = :uid', { uid })
+			.andWhere('n.id in (:...ids)', { ids: nutritionIds });
 
 		return await query.getRawMany();
 	}
