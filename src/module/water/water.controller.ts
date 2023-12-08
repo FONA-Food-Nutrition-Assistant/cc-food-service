@@ -2,7 +2,6 @@
 import {
 	Body,
 	Controller,
-	Get,
 	Post,
 	Put,
 	HttpStatus,
@@ -16,8 +15,8 @@ import { TidyResponse } from 'src/util/responseHelper';
 import { WaterService } from './water.service';
 
 /* DTO */
-import { CreateWaterDto } from './dto/create-water.dto';
-import { UpdateWaterDto } from './dto/update-water.dto';
+import { RequestCreateRecordWaterDto } from './dto/create-water.dto';
+import { RequestUpdateRecordWaterDto } from './dto/update-water.dto';
 
 @Controller('water')
 export class WaterController {
@@ -25,19 +24,21 @@ export class WaterController {
 
 	@Post()
 	async storeWater(
-		@Body() params: CreateWaterDto,
+		@Body() params: RequestCreateRecordWaterDto,
 		@Headers('fona-client-uid') uid: string,
 	) {
-		const data = await this.WaterService.storeWaterById(params, uid);
+		params.prepParams(uid);
+		const data = await this.WaterService.createRecordWater(params);
 		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_CREATE, []);
 	}
 
 	@Put()
 	async updateWater(
-		@Body() params: UpdateWaterDto,
+		@Body() params: RequestUpdateRecordWaterDto,
 		@Headers('fona-client-uid') uid: string,
 	) {
-		const data = await this.WaterService.updateWaterById(params, uid);
+		params.prepParams(uid);
+		const data = await this.WaterService.updateRecordWater(params);
 		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_UPDATE, data);
 	}
 }
