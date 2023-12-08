@@ -15,7 +15,14 @@ import {
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Console } from 'console';
-import { RequestUpdateRecordFoodDto } from './dto/update-record-food.dto';
+import {
+	RequestUpdateRecordFoodDto,
+	ResponseUpdateRecordFoodDto,
+} from './dto/update-record-food.dto';
+import {
+	RequestCreateRecordFoodDto,
+	ResponseCreateRecordFoodDto,
+} from './dto/create-record-food.dto';
 
 @Injectable()
 export class FoodService {
@@ -62,45 +69,49 @@ export class FoodService {
 		}
 	}
 
-	async storeFood(params, uid) {
+	async storeRecordFood(params: RequestCreateRecordFoodDto) {
 		try {
-			let foods_contain_allergies: boolean = false;
+			const checkRegisteredNutritions =
+				await this.GetModel.checkRegisteredNutrition(params);
 
-			const check_registered_nutritions =
-				await this.GetModel.checkRegisteredNutrition({ params, uid });
-
-			if (check_registered_nutritions) {
+			if (checkRegisteredNutritions) {
 				throw new HttpException(
 					ResponseMessage.ERR_FOOD_DATA_HAS_BEEN_REGISTERED,
 					HttpStatus.BAD_REQUEST,
 				);
 			}
 
+			await this.DeleteModel.deleteUserNutritions(params);
+
+			const data = await this.PostModel.storeFood(params);
+
 			const foods = params.foods.map(food => food.nutrition_id);
 
-			const check_nutritions_allergies =
-				await this.GetModel.checkNutritionsAllergies(foods, params.uid);
+			let foodsContainAllergies = await this.GetModel.checkNutritionsAllergies(
+				foods,
+				params.uid,
+			);
 
-			if (check_nutritions_allergies) {
-				foods_contain_allergies = true;
-			}
+			foodsContainAllergies = foodsContainAllergies.map(val => val.food);
 
-			const data = await this.PostModel.storeFood({ params, uid });
+			const isFoodsContainAllergies = foodsContainAllergies.length > 0 || false;
 
 			return {
-				foods_contain_allergies,
-			};
+				is_foods_contain_allergies: isFoodsContainAllergies,
+				foods_contain_allergies: foodsContainAllergies,
+				data,
+			} as ResponseCreateRecordFoodDto;
 		} catch (error) {
 			throw error;
 		}
 	}
 
-	async updateFood(params: RequestUpdateRecordFoodDto) {
+	async updateRecordFood(params: RequestUpdateRecordFoodDto) {
 		try {
-			const check_registered_nutritions =
+			const checkRegisteredNutritions =
 				await this.GetModel.checkRegisteredNutrition(params);
 
-			if (!check_registered_nutritions) {
+			if (!checkRegisteredNutritions) {
 				throw new HttpException(
 					ResponseMessage.ERR_FOOD_DATA_HAS_NOT_BEEN_REGISTERED,
 					HttpStatus.BAD_REQUEST,
@@ -113,19 +124,20 @@ export class FoodService {
 
 			const foods = params.foods.map(food => food.nutrition_id);
 
-			let foods_contain_allergies =
-				await this.GetModel.checkNutritionsAllergies(foods, params.uid);
+			let foodsContainAllergies = await this.GetModel.checkNutritionsAllergies(
+				foods,
+				params.uid,
+			);
 
-			foods_contain_allergies = foods_contain_allergies.map(val => val.food);
+			foodsContainAllergies = foodsContainAllergies.map(val => val.food);
 
-			const is_foods_contain_allergies =
-				foods_contain_allergies.length > 0 || false;
+			const isFoodsContainAllergies = foodsContainAllergies.length > 0 || false;
 
 			return {
-				is_foods_contain_allergies,
-				foods_contain_allergies,
+				is_foods_contain_allergies: isFoodsContainAllergies,
+				foods_contain_allergies: foodsContainAllergies,
 				data,
-			};
+			} as ResponseUpdateRecordFoodDto;
 		} catch (error) {
 			throw error;
 		}

@@ -10,6 +10,7 @@ import { RequestListNutritionDto } from '../dto/list-nutrition.dto';
 import { FoodAllergyEntity } from '../entities/food-allergy.entity';
 import { UserAllergyEntity } from '../entities/user-allergy.entity';
 import { AllergyEntity } from '../entities/allergy.entity';
+import { RequestUpdateRecordFoodDto } from '../dto/update-record-food.dto';
 
 @Injectable()
 export class GetModel {
@@ -63,7 +64,7 @@ export class GetModel {
 		return await query.getRawMany();
 	}
 
-	async checkRegisteredNutrition(params) {
+	async checkRegisteredNutrition(params: RequestUpdateRecordFoodDto) {
 		const query = this.UserNutritionRepository.createQueryBuilder()
 			.where('user_id = :uid', { uid: params.uid })
 			.andWhere('date = :date', { date: params.date })

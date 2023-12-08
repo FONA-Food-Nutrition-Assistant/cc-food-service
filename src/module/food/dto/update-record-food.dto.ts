@@ -1,5 +1,4 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateFoodDto } from './create-food.dto';
 import { NutritionObjectDto } from './nutrition-object.dto';
 
 import { IsNotEmpty, IsString, IsEnum, ValidateNested } from 'class-validator';
