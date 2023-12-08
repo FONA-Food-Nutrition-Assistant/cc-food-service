@@ -1,8 +1,9 @@
-import { IsDate, IsNotEmpty, IsNumber, isDate } from 'class-validator';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class NutritionObjectDto {
 	@IsNotEmpty()
-	foods: NutritionObjectDto[];
+	@IsNumber()
+	nutrition_id: number;
 
 	@IsNotEmpty()
 	@IsNumber()
