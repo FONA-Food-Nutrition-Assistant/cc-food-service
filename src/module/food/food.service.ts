@@ -15,6 +15,7 @@ import {
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Console } from 'console';
+import { RequestUpdateRecordFoodDto } from './dto/update-record-food.dto';
 
 @Injectable()
 export class FoodService {
@@ -75,10 +76,10 @@ export class FoodService {
 				);
 			}
 
-			const check_nutritions_allergies =
-				await this.GetModel.checkNutritionsAllergies({ params, uid });
+			const foods = params.foods.map(food => food.nutrition_id);
 
-			console.log('sini');
+			const check_nutritions_allergies =
+				await this.GetModel.checkNutritionsAllergies(foods, params.uid);
 
 			if (check_nutritions_allergies) {
 				foods_contain_allergies = true;
@@ -94,12 +95,10 @@ export class FoodService {
 		}
 	}
 
-	async updateFood(params, uid) {
+	async updateFood(params: RequestUpdateRecordFoodDto) {
 		try {
-			let is_foods_contain_allergies: boolean = true;
-
 			const check_registered_nutritions =
-				await this.GetModel.checkRegisteredNutrition({ params, uid });
+				await this.GetModel.checkRegisteredNutrition(params);
 
 			if (!check_registered_nutritions) {
 				throw new HttpException(
@@ -108,20 +107,23 @@ export class FoodService {
 				);
 			}
 
-			await this.DeleteModel.deleteUserNutritions({ params, uid });
+			await this.DeleteModel.deleteUserNutritions(params);
 
-			const data = await this.PutModel.updateFood({ params, uid });
+			const data = await this.PutModel.updateFood(params);
 
-			const check_nutritions_allergies =
-				await this.GetModel.checkNutritionsAllergies({ params, uid });
+			const foods = params.foods.map(food => food.nutrition_id);
 
-			if (!check_nutritions_allergies) {
-				is_foods_contain_allergies = false;
-			}
+			let foods_contain_allergies =
+				await this.GetModel.checkNutritionsAllergies(foods, params.uid);
+
+			foods_contain_allergies = foods_contain_allergies.map(val => val.food);
+
+			const is_foods_contain_allergies =
+				foods_contain_allergies.length > 0 || false;
 
 			return {
 				is_foods_contain_allergies,
-				foods_contain_allergies: check_nutritions_allergies,
+				foods_contain_allergies,
 				data,
 			};
 		} catch (error) {

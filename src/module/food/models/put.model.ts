@@ -12,14 +12,14 @@ export class PutModel {
 		private readonly UserNutritionRepository: Repository<UserNutritionEntity>,
 	) {}
 
-	async updateFood({ params, uid }) {
+	async updateFood(params) {
 		let user_nutrition: Object;
 		let data: Object[] = [];
 		const nutritionRepo = this.UserNutritionRepository;
 
 		params.foods.forEach(async function (food) {
 			user_nutrition = {
-				user_id: uid,
+				user_id: params.uid,
 				nutrition_id: food.nutrition_id,
 				quantity: food.quantity,
 				date: params.date,

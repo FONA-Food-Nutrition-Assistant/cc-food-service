@@ -10,11 +10,11 @@ export class DeleteModel {
 		private readonly UserNutritionRepository: Repository<UserNutritionEntity>,
 	) {}
 
-	async deleteUserNutritions({ params, uid }) {
+	async deleteUserNutritions(params) {
 		let query = await this.UserNutritionRepository.createQueryBuilder()
 			.delete()
 			.from(UserNutritionEntity)
-			.where('user_id = :id', { id: uid })
+			.where('user_id = :id', { id: params.uid })
 			.andWhere('date = :date', { date: params.date })
 			.andWhere('meal_time = :meal_time', {
 				meal_time: params.meal_time,

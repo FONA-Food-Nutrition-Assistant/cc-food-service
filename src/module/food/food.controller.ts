@@ -18,7 +18,7 @@ import { FoodService } from './food.service';
 
 /* DTO */
 import { CreateFoodDto } from './dto/create-food.dto';
-import { UpdateFoodDto } from './dto/update-food.dto';
+import { RequestUpdateRecordFoodDto } from './dto/update-record-food.dto';
 import { RequestListFoodDto } from './dto/list-food.dto';
 import { RequestListNutritionDto } from './dto/list-nutrition.dto';
 import { RequestFoodDetailDto } from './dto/food-detail.dto';
@@ -57,11 +57,12 @@ export class FoodController {
 	}
 
 	@Put()
-	async updateWater(
-		@Body() params: UpdateFoodDto,
+	async updateFood(
+		@Body() params: RequestUpdateRecordFoodDto,
 		@Headers('fona-client-uid') uid: string,
 	) {
-		const data = await this.foodService.updateFood(params, uid);
+		params.prepParams(uid);
+		const data = await this.foodService.updateFood(params);
 		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_UPDATE, data);
 	}
 
