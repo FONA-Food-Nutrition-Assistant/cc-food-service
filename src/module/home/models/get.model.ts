@@ -11,6 +11,7 @@ import { UserEntity } from '../entities/user.entity';
 import { FoodEntity } from 'src/module/food/entities/food.entity';
 import { NutritionPacketEntity } from '../entities/nutrition_packet.entity';
 import { PacketEntity } from '../entities/packet.entity';
+import { RequestHomeDto } from '../dto/home.dto';
 
 @Injectable()
 export class GetModel {
@@ -21,11 +22,11 @@ export class GetModel {
 		private readonly UserRepository: Repository<UserEntity>,
 		@InjectRepository(NutritionPacketEntity)
 		private readonly NutritionPacketRepository: Repository<NutritionPacketEntity>,
-		@InjectRepository(PacketEntity)
-		private readonly PacketRepository: Repository<PacketEntity>,
+		@InjectRepository(WaterEntity)
+		private readonly WaterRepository: Repository<WaterEntity>,
 	) {}
 
-	async getRecordedNutrition({ date, uid }) {
+	async getRecordedNutrition(params: RequestHomeDto) {
 		let query = this.UserNutritionRepository.createQueryBuilder('un')
 			.select(
 				'u.uid, un.meal_time, un.date, un.quantity, f.name, n.*, w.number_of_cups',
@@ -34,46 +35,76 @@ export class GetModel {
 			.leftJoin(UserEntity, 'u', 'un.user_id = u.uid')
 			.leftJoin(FoodEntity, 'f', 'n.food_id = f.id')
 			.leftJoin(WaterEntity, 'w', 'w.user_id = u.uid')
-			.where('un.date = :date', { date })
-			.andWhere('u.uid = :uid', { uid });
+			.where('un.date = :date', { date: params.date })
+			.andWhere('u.uid = :uid', { uid: params.uid });
 
 		return await query.getRawMany();
 	}
 
-	async getFoodsBasedCalorieIntake(calorieIntake) {
-		console.log(
-			calorieIntake.lowestbreakfastIntake,
-			calorieIntake.highestbreakfastIntake,
-		);
+	async getRecordedWater(params: RequestHomeDto) {
+		let query = this.WaterRepository.createQueryBuilder()
+			.select('number_of_cups')
+			.where('date = :date', { date: params.date })
+			.andWhere('user_id = :uid', { uid: params.uid });
 
-		let query = this.NutritionPacketRepository.createQueryBuilder('np')
+		return await query.getRawMany();
+	}
+
+	async getFoodsBasedCalorieIntake(calorieIntake: Object) {
+		console.log(calorieIntake);
+		let query_breakfast = this.NutritionPacketRepository.createQueryBuilder(
+			'np',
+		)
 			.select('p.name as packet_name, f.name as food_name, p.total_cals')
 			.leftJoin(PacketEntity, 'p', 'p.id = np.packet_id')
 			.leftJoin(NutritionEntity, 'n', 'n.id = np.nutrition_id')
 			.leftJoin(FoodEntity, 'f', 'f.id = n.food_id')
 			.where(
-				'p.total_cals >= :lowestbreakfastIntake and p.total_cals <= :highestbreakfastIntake',
+				'p.total_cals >= :lowestBreakfastIntake and p.total_cals <= :highestBreakfastIntake',
 				{
-					lowestbreakfastIntake: calorieIntake.lowestbreakfastIntake,
-					highestbreakfastIntake: calorieIntake.highestbreakfastIntake,
+					lowestBreakfastIntake: calorieIntake['lowestBreakfastIntake'],
+					highestBreakfastIntake: calorieIntake['highestBreakfastIntake'],
 				},
 			);
 
-		return await query.getRawMany();
-	}
-
-	async getUserById(uid) {
-		const result = await this.UserRepository.createQueryBuilder('user')
-			.select('*')
-			.where('uid = :uid', { uid: uid })
-			.getRawOne();
-
-		if (!result)
-			throw new HttpException(
-				ResponseMessage.ERR_USER_NOT_FOUND,
-				HttpStatus.BAD_REQUEST,
+		let query_lunch = this.NutritionPacketRepository.createQueryBuilder('np')
+			.select('p.name as packet_name, f.name as food_name, p.total_cals')
+			.leftJoin(PacketEntity, 'p', 'p.id = np.packet_id')
+			.leftJoin(NutritionEntity, 'n', 'n.id = np.nutrition_id')
+			.leftJoin(FoodEntity, 'f', 'f.id = n.food_id')
+			.where(
+				'p.total_cals >= :lowestLunchIntake and p.total_cals <= :highestLunchIntake',
+				{
+					lowestLunchIntake: calorieIntake['lowestLunchIntake'],
+					highestLunchIntake: calorieIntake['highestLunchIntake'],
+				},
 			);
 
-		return result;
+		let query_dinner = this.NutritionPacketRepository.createQueryBuilder('np')
+			.select('p.name as packet_name, f.name as food_name, p.total_cals')
+			.leftJoin(PacketEntity, 'p', 'p.id = np.packet_id')
+			.leftJoin(NutritionEntity, 'n', 'n.id = np.nutrition_id')
+			.leftJoin(FoodEntity, 'f', 'f.id = n.food_id')
+			.where(
+				'p.total_cals >= :lowestDinnerIntake and p.total_cals <= :highestDinnerIntake',
+				{
+					lowestDinnerIntake: calorieIntake['lowestDinnerIntake'],
+					highestDinnerIntake: calorieIntake['highestDinnerIntake'],
+				},
+			);
+
+		return {
+			query_breakfast: await query_breakfast.getRawMany(),
+			query_lunch: await query_lunch.getRawMany(),
+			query_dinner: await query_dinner.getRawMany(),
+		};
+	}
+
+	async getUserById(uid: string) {
+		const result = this.UserRepository.createQueryBuilder('user')
+			.select('*')
+			.where('uid = :uid', { uid });
+
+		return await result.getRawOne();
 	}
 }

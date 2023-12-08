@@ -1,19 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { GetModel } from './models/get.model';
 import { Mealtime } from '../../common/enum/meal_time.enum';
 import { CalculationHelper } from '../../util/calculationHelper';
+import { RequestHomeDto } from './dto/home.dto';
+import { ResponseMessage } from 'src/common/message/message.enum';
+import { UserEntity } from './entities/user.entity';
+import { Gender } from 'src/common/enum/gender.enum';
+import { Activity } from 'src/common/enum/activity.enum';
 @Injectable()
 export class HomeService {
 	private readonly calculationHelper = new CalculationHelper();
 
 	constructor(private readonly GetModel: GetModel) {}
 
-	async foodAndQuantity(recordedNutrition, meal_time) {
+	async foodAndQuantity(recordedNutrition: any[], meal_time: Mealtime) {
 		return recordedNutrition
-			.filter(food => {
+			.filter((food: { meal_time: any }) => {
 				return food.meal_time == meal_time;
 			})
-			.map(food => {
+			.map((food: { name: any; quantity: any }) => {
 				return {
 					name: food.name,
 					quantity: food.quantity,
@@ -21,7 +26,7 @@ export class HomeService {
 			});
 	}
 
-	async getTdee(user) {
+	async getTdee(user: UserEntity) {
 		const age = this.calculationHelper.calculateAge(user.date_of_birth);
 
 		let tdee = parseFloat(
@@ -30,8 +35,8 @@ export class HomeService {
 					user.weight,
 					user.height,
 					age,
-					user.gender,
-					user.activity,
+					user.gender as Gender,
+					user.activity as Activity,
 				)
 				.toFixed(2),
 		);
@@ -39,34 +44,42 @@ export class HomeService {
 		return tdee;
 	}
 
-	async calorieIntake(tdee) {
+	async calorieIntake(tdee: number) {
 		const tolerance = 0.01;
 
-		const lowestbreakfastIntake = Math.round((0.3 - tolerance) * tdee);
-		const highestbreakfastIntake = Math.round((0.35 + tolerance) * tdee);
+		const lowestBreakfastIntake = Math.round((0.3 - tolerance) * tdee);
+		const highestBreakfastIntake = Math.round((0.35 + tolerance) * tdee);
 
-		const lowestlunchIntake = Math.round((0.35 - tolerance) * tdee);
-		const highestlunchIntake = Math.round((0.4 + tolerance) * tdee);
+		const lowestLunchIntake = Math.round((0.35 - tolerance) * tdee);
+		const highestLunchIntake = Math.round((0.4 + tolerance) * tdee);
 
-		const lowestdinnerIntake = Math.round((0.25 - tolerance) * tdee);
-		const highestdinnerIntake = Math.round((0.35 + tolerance) * tdee);
+		const lowestDinnerIntake = Math.round((0.25 - tolerance) * tdee);
+		const highestDinnerIntake = Math.round((0.35 + tolerance) * tdee);
 
 		return {
-			lowestbreakfastIntake,
-			highestbreakfastIntake,
-			lowestlunchIntake,
-			highestlunchIntake,
-			lowestdinnerIntake,
-			highestdinnerIntake,
+			lowestBreakfastIntake,
+			highestBreakfastIntake,
+			lowestLunchIntake,
+			highestLunchIntake,
+			lowestDinnerIntake,
+			highestDinnerIntake,
 		};
 	}
 
-	async foodRecommendation(tdee) {}
+	async foodRecommendation(tdee: any) {}
 
-	async getAllData(date, uid) {
+	async getAllData(params: RequestHomeDto) {
 		try {
-			const user = await this.GetModel.getUserById(uid);
-			let tdee = await this.getTdee(user);
+			const user = await this.GetModel.getUserById(params.uid);
+
+			if (!user)
+				throw new HttpException(
+					ResponseMessage.ERR_USER_NOT_FOUND,
+					HttpStatus.BAD_REQUEST,
+				);
+
+			const tdee = await this.getTdee(user);
+
 			let calorieIntake = await this.calorieIntake(tdee);
 
 			const foodsByCaloriesIntake =
@@ -76,10 +89,9 @@ export class HomeService {
 
 			let foodRecommendation = await this.foodRecommendation(tdee);
 
-			const recordedNutrition = await this.GetModel.getRecordedNutrition({
-				date,
-				uid,
-			});
+			const recordedNutrition = await this.GetModel.getRecordedNutrition(
+				params,
+			);
 
 			const breakfast = await this.foodAndQuantity(
 				recordedNutrition,
@@ -95,53 +107,53 @@ export class HomeService {
 				Mealtime.DINNER,
 			);
 
-			// let water = recordedNutrition[0].number_of_cups;
+			let water = await this.GetModel.getRecordedWater(params);
 
-			// if (!water) {
-			// 	water = null;
-			// }
+			if (!water) {
+				water = null;
+			}
 
-			let total_cals: number = 0;
-			let total_carbos: number = 0;
-			let total_proteins: number = 0;
-			let total_fibers: number = 0;
-			let total_fats: number = 0;
-			let total_glucoses: number = 0;
-			let total_sodiums: number = 0;
-			let total_caliums: number = 0;
+			let totalCals: number = 0;
+			let totalCarbos: number = 0;
+			let totalProteins: number = 0;
+			let totalFibers: number = 0;
+			let totalFats: number = 0;
+			let totalGlucoses: number = 0;
+			let totalSodiums: number = 0;
+			let totalCaliums: number = 0;
 
 			recordedNutrition.forEach(food => {
-				total_cals += food.cals;
-				total_carbos += food.carbos;
-				total_proteins += food.proteins;
-				total_fibers += food.fibers;
-				total_fats += food.fats;
-				total_glucoses += food.glucoses;
-				total_sodiums += food.sodiums;
-				total_caliums += food.caliums;
+				totalCals += food.cals;
+				totalCarbos += food.carbos;
+				totalProteins += food.proteins;
+				totalFibers += food.fibers;
+				totalFats += food.fats;
+				totalGlucoses += food.glucoses;
+				totalSodiums += food.sodiums;
+				totalCaliums += food.caliums;
 			});
 
-			total_cals = parseFloat(total_cals.toFixed(2));
-			total_carbos = parseFloat(total_carbos.toFixed(2));
-			total_proteins = parseFloat(total_proteins.toFixed(2));
-			total_fibers = parseFloat(total_fibers.toFixed(2));
-			total_fats = parseFloat(total_fats.toFixed(2));
-			total_glucoses = parseFloat(total_glucoses.toFixed(2));
-			total_sodiums = parseFloat(total_sodiums.toFixed(2));
-			total_caliums = parseFloat(total_caliums.toFixed(2));
+			totalCals = parseFloat(totalCals.toFixed(2));
+			totalCarbos = parseFloat(totalCarbos.toFixed(2));
+			totalProteins = parseFloat(totalProteins.toFixed(2));
+			totalFibers = parseFloat(totalFibers.toFixed(2));
+			totalFats = parseFloat(totalFats.toFixed(2));
+			totalGlucoses = parseFloat(totalGlucoses.toFixed(2));
+			totalSodiums = parseFloat(totalSodiums.toFixed(2));
+			totalCaliums = parseFloat(totalCaliums.toFixed(2));
 
 			return {
-				// recordedNutrition,
+				recordedNutrition,
 				daily_analysis: {
 					TDEE: tdee,
-					total_cals,
-					total_carbos,
-					total_proteins,
-					total_fibers,
-					total_fats,
-					total_glucoses,
-					total_sodiums,
-					total_caliums,
+					total_cals: totalCals,
+					total_carbos: totalCarbos,
+					total_proteins: totalProteins,
+					total_fibers: totalFibers,
+					total_fats: totalFats,
+					total_glucoses: totalGlucoses,
+					total_sodiums: totalSodiums,
+					total_caliums: totalCaliums,
 				},
 				record_foods: {
 					breakfast,
@@ -149,7 +161,7 @@ export class HomeService {
 					dinner,
 				},
 				// foodRecommentation: foodRecommentation,
-				// water,
+				water,
 			};
 		} catch (error) {
 			throw error;

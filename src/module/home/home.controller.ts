@@ -16,6 +16,7 @@ import {
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { TidyResponse } from 'src/util/responseHelper';
 import { HomeService } from './home.service';
+import { RequestHomeDto } from './dto/home.dto';
 
 /* DTO */
 
@@ -25,10 +26,11 @@ export class HomeController {
 
 	@Get()
 	async home(
-		@Query('date') date: string,
+		@Query() params: RequestHomeDto,
 		@Headers('fona-client-uid') uid: string,
 	) {
-		const data = await this.homeService.getAllData(date, uid);
+		params.prepParams(uid);
+		const data = await this.homeService.getAllData(params);
 		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_LIST, data);
 	}
 }

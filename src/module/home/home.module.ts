@@ -7,6 +7,7 @@ import { UserEntity } from './entities/user.entity';
 import { PacketEntity } from './entities/packet.entity';
 import { UserNutritionEntity } from '../food/entities/user-nutrition.entity';
 import { NutritionPacketEntity } from './entities/nutrition_packet.entity';
+import { WaterEntity } from '../water/entities/water.entity';
 
 @Module({
 	imports: [
@@ -15,6 +16,7 @@ import { NutritionPacketEntity } from './entities/nutrition_packet.entity';
 			UserEntity,
 			PacketEntity,
 			NutritionPacketEntity,
+			WaterEntity,
 		]),
 	],
 	controllers: [HomeController],
