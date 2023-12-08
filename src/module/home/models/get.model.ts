@@ -4,74 +4,76 @@ import { Repository } from 'typeorm';
 import { error } from 'console';
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { FoodEntity } from 'src/module/food/entities/food.entity';
+import { UserNutritionEntity } from 'src/module/food/entities/user-nutrition.entity';
 import { WaterEntity } from 'src/module/water/entities/water.entity';
+import { NutritionEntity } from 'src/module/food/entities/nutrition.entity';
+import { UserEntity } from '../entities/user.entity';
+import { FoodEntity } from 'src/module/food/entities/food.entity';
+import { NutritionPacketEntity } from '../entities/nutrition_packet.entity';
+import { PacketEntity } from '../entities/packet.entity';
 
 @Injectable()
 export class GetModel {
 	constructor(
-		@InjectRepository(FoodEntity)
-		@InjectRepository(WaterEntity)
-		private readonly FoodRepository: Repository<FoodEntity>,
-		private readonly WaterRepository: Repository<WaterEntity>,
+		@InjectRepository(UserNutritionEntity)
+		private readonly UserNutritionRepository: Repository<UserNutritionEntity>,
+		@InjectRepository(UserEntity)
+		private readonly UserRepository: Repository<UserEntity>,
+		@InjectRepository(NutritionPacketEntity)
+		private readonly NutritionPacketRepository: Repository<NutritionPacketEntity>,
+		@InjectRepository(PacketEntity)
+		private readonly PacketRepository: Repository<PacketEntity>,
 	) {}
 
-	async getAllData({ params, uid }) {
-		try {
-			const checker = await this.FoodRepository.createQueryBuilder('food')
-				.where('user_id = :uid', { uid: uid })
-				.andWhere('date = :date', { date: params.date })
-				.andWhere('meal_time = :meal_time', { meal_time: params.meal_time })
-				.getRawOne();
+	async getRecordedNutrition({ date, uid }) {
+		let query = this.UserNutritionRepository.createQueryBuilder('un')
+			.select(
+				'u.uid, un.meal_time, un.date, un.quantity, f.name, n.*, w.number_of_cups',
+			)
+			.leftJoin(NutritionEntity, 'n', 'un.nutrition_id = n.id')
+			.leftJoin(UserEntity, 'u', 'un.user_id = u.uid')
+			.leftJoin(FoodEntity, 'f', 'n.food_id = f.id')
+			.leftJoin(WaterEntity, 'w', 'w.user_id = u.uid')
+			.where('un.date = :date', { date })
+			.andWhere('u.uid = :uid', { uid });
 
-			if (!checker) {
-				throw new HttpException(
-					ResponseMessage.ERR_FOOD_DATA_HAS_NOT_BEEN_REGISTERED,
-					HttpStatus.BAD_REQUEST,
-				);
-			}
+		return await query.getRawMany();
+	}
 
-			await this.FoodRepository.createQueryBuilder()
-				.delete()
-				.from(FoodEntity)
-				.where('user_id = :id', { id: uid })
-				.andWhere('date = :date', { date: params.date })
-				.andWhere('meal_time = :meal_time', { meal_time: params.meal_time })
-				.execute();
+	async getFoodsBasedCalorieIntake(calorieIntake) {
+		console.log(
+			calorieIntake.lowestbreakfastIntake,
+			calorieIntake.highestbreakfastIntake,
+		);
 
-			let user_food: Object;
+		let query = this.NutritionPacketRepository.createQueryBuilder('np')
+			.select('p.name as packet_name, f.name as food_name, p.total_cals')
+			.leftJoin(PacketEntity, 'p', 'p.id = np.packet_id')
+			.leftJoin(NutritionEntity, 'n', 'n.id = np.nutrition_id')
+			.leftJoin(FoodEntity, 'f', 'f.id = n.food_id')
+			.where(
+				'p.total_cals >= :lowestbreakfastIntake and p.total_cals <= :highestbreakfastIntake',
+				{
+					lowestbreakfastIntake: calorieIntake.lowestbreakfastIntake,
+					highestbreakfastIntake: calorieIntake.highestbreakfastIntake,
+				},
+			);
 
-			const foodRepo = this.FoodRepository; // Assign the repository to a variable
+		return await query.getRawMany();
+	}
 
-			params.foods.forEach(async function (food, i) {
-				try {
-					user_food = {
-						user_id: uid,
-						food_id: food.food_id,
-						quantity: food.quantity,
-						date: params.date,
-						meal_time: params.meal_time,
-					};
+	async getUserById(uid) {
+		const result = await this.UserRepository.createQueryBuilder('user')
+			.select('*')
+			.where('uid = :uid', { uid: uid })
+			.getRawOne();
 
-					try {
-						await foodRepo
-							.createQueryBuilder()
-							.insert()
-							.values(user_food)
-							.execute();
-					} catch (error) {
-						console.error('Error while inserting:', error);
-						throw error; // Rethrow the error to handle it where the function is called
-					}
-				} catch (error) {
-					console.error('Error while inserting:', error);
-					throw error; // Rethrow the error to handle it where the function is called
-				}
-			});
+		if (!result)
+			throw new HttpException(
+				ResponseMessage.ERR_USER_NOT_FOUND,
+				HttpStatus.BAD_REQUEST,
+			);
 
-			return 'User daily foods information has been successfuly updated!';
-		} catch (error) {
-			throw error;
-		}
+		return result;
 	}
 }

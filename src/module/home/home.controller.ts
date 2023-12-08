@@ -7,6 +7,8 @@ import {
 	Put,
 	HttpStatus,
 	Headers,
+	Param,
+	Query,
 } from '@nestjs/common';
 // import { FastifyReply } from 'fastify';
 
@@ -16,7 +18,6 @@ import { TidyResponse } from 'src/util/responseHelper';
 import { HomeService } from './home.service';
 
 /* DTO */
-import { CreateHomeDto } from './dto/create-home.dto';
 
 @Controller('home')
 export class HomeController {
@@ -24,10 +25,10 @@ export class HomeController {
 
 	@Get()
 	async home(
-		@Body() params: CreateHomeDto,
+		@Query('date') date: string,
 		@Headers('fona-client-uid') uid: string,
 	) {
-		const data = await this.homeService.getAllData(params, uid);
-		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_CREATE, data);
+		const data = await this.homeService.getAllData(date, uid);
+		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_LIST, data);
 	}
 }

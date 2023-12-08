@@ -3,18 +3,27 @@ import { HomeController } from './home.controller';
 import { HomeService } from './home.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GetModel } from './models/get.model';
-import { FoodEntity } from '../food/entities/food.entity';
-import { FoodService } from '../food/food.service';
+import { UserEntity } from './entities/user.entity';
+import { PacketEntity } from './entities/packet.entity';
+import { UserNutritionEntity } from '../food/entities/user-nutrition.entity';
+import { NutritionPacketEntity } from './entities/nutrition_packet.entity';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([FoodEntity])],
+	imports: [
+		TypeOrmModule.forFeature([
+			UserNutritionEntity,
+			UserEntity,
+			PacketEntity,
+			NutritionPacketEntity,
+		]),
+	],
 	controllers: [HomeController],
 	providers: [
 		/** Services */
-		FoodService,
+		HomeService,
 
 		/** Models */
 		GetModel,
 	],
 })
-export class FoodModule {}
+export class HomeModule {}
