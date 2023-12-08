@@ -8,6 +8,8 @@ import { PutModel } from './models/put.model';
 import { NutritionEntity } from './entities/nutrition.entity';
 import { FoodEntity } from './entities/food.entity';
 import { GetModel } from './models/get.model';
+import { UserAllergyEntity } from './entities/user-allergy.entity';
+import { DeleteModel } from './models/delete.model';
 
 @Module({
 	imports: [
@@ -15,6 +17,7 @@ import { GetModel } from './models/get.model';
 			FoodEntity,
 			NutritionEntity,
 			UserNutritionEntity,
+			UserAllergyEntity,
 		]),
 	],
 	controllers: [FoodController],
@@ -26,6 +29,7 @@ import { GetModel } from './models/get.model';
 		PostModel,
 		PutModel,
 		GetModel,
+		DeleteModel,
 	],
 })
 export class FoodModule {}
