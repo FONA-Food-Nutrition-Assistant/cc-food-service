@@ -65,14 +65,14 @@ export class HomeService {
 		try {
 			const user = await this.GetModel.getUserById(uid);
 			let tdee = await this.getTdee(user);
-			let calorieIntake = await this.calorieIntake(tdee);
+			// let calorieIntake = await this.calorieIntake(tdee);
 
-			const foodsByCaloriesIntake =
-				await this.GetModel.getFoodsBasedCalorieIntake(calorieIntake);
+			// const foodsByCaloriesIntake =
+			// 	await this.GetModel.getFoodsBasedCalorieIntake(calorieIntake);
 
-			return foodsByCaloriesIntake;
+			// return foodsByCaloriesIntake;
 
-			let foodRecommendation = await this.foodRecommendation(tdee);
+			// let foodRecommendation = await this.foodRecommendation(tdee);
 
 			const recordedNutrition = await this.GetModel.getRecordedNutrition({
 				date,
