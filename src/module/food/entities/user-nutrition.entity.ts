@@ -11,7 +11,7 @@ export class UserNutritionEntity {
 	@PrimaryGeneratedColumn('uuid')
 	@PrimaryColumn()
 	@Index()
-	id: number;
+	id?: number;
 
 	@Column({ type: 'varchar', length: 255, nullable: false })
 	user_id: string;
@@ -29,8 +29,8 @@ export class UserNutritionEntity {
 	meal_time: string;
 
 	@Column({ type: 'date' })
-	created_at: Date;
+	created_at?: Date;
 
 	@Column({ type: 'date' })
-	updated_at: Date;
+	updated_at?: Date;
 }
