@@ -7,18 +7,34 @@ import { ResponseMessage } from 'src/common/message/message.enum';
 import { UserEntity } from './entities/user.entity';
 import { Gender } from 'src/common/enum/gender.enum';
 import { Activity } from 'src/common/enum/activity.enum';
+
+type foodSuggestion = {
+	id: number;
+	name: string;
+	total_cals: number;
+	foods: Array<{ name: string }>;
+};
+
+type query = {
+	packet_name: string;
+	food_name: string;
+	total_cals: number;
+	id: number;
+	food_id: number;
+};
+
 @Injectable()
 export class HomeService {
 	private readonly calculationHelper = new CalculationHelper();
 
 	constructor(private readonly GetModel: GetModel) {}
 
-	async foodAndQuantity(recordedNutrition: any[], meal_time: Mealtime) {
+	async foodAndQuantity(recordedNutrition: Object[], meal_time: Mealtime) {
 		return recordedNutrition
-			.filter((food: { meal_time: any }) => {
+			.filter((food: { meal_time: Mealtime }) => {
 				return food.meal_time == meal_time;
 			})
-			.map((food: { name: any; quantity: any }) => {
+			.map((food: { name: string; quantity: number }) => {
 				return {
 					name: food.name,
 					quantity: food.quantity,
@@ -45,7 +61,7 @@ export class HomeService {
 	}
 
 	async calorieIntake(tdee: number) {
-		const tolerance = 0.01;
+		const tolerance = 0.015;
 
 		const lowestBreakfastIntake = Math.round((0.3 - tolerance) * tdee);
 		const highestBreakfastIntake = Math.round((0.35 + tolerance) * tdee);
@@ -66,7 +82,29 @@ export class HomeService {
 		};
 	}
 
-	async foodRecommendation(tdee: any) {}
+	async convertArrayOfObject(query: Array<query>) {
+		return Object.values(
+			query.reduce((acc, curr) => {
+				const { packet_name, food_name, total_cals, id, food_id } = curr;
+
+				if (!acc[packet_name]) {
+					acc[packet_name] = {
+						id,
+						name: packet_name,
+						total_cals: total_cals,
+						foods: [],
+					};
+				}
+
+				acc[packet_name].foods.push({
+					id: food_id,
+					name: food_name,
+				});
+
+				return acc;
+			}, {}),
+		);
+	}
 
 	async getAllData(params: RequestHomeDto) {
 		try {
@@ -85,9 +123,75 @@ export class HomeService {
 			const foodsByCaloriesIntake =
 				await this.GetModel.getFoodsBasedCalorieIntake(calorieIntake);
 
-			return foodsByCaloriesIntake;
+			let breakfastSuggestion: foodSuggestion;
+			let lunchSuggestion: foodSuggestion;
+			let dinnerSuggestion: foodSuggestion;
 
-			let foodRecommendation = await this.foodRecommendation(tdee);
+			let userAllergies = await this.GetModel.getFoodsByUserAllergies(
+				params.uid,
+			);
+
+			userAllergies = userAllergies.map(val => val.f_id);
+
+			let breakfastArrOfObj = await this.convertArrayOfObject(
+				foodsByCaloriesIntake.query_breakfast,
+			);
+
+			breakfastArrOfObj = breakfastArrOfObj.filter(val => {
+				return (
+					val['foods'].some((item: { id: number }) =>
+						userAllergies.includes(item.id),
+					) == false
+				);
+			});
+
+			let lunchArrOfObj = await this.convertArrayOfObject(
+				foodsByCaloriesIntake.query_lunch,
+			);
+
+			lunchArrOfObj = lunchArrOfObj.filter(val => {
+				return (
+					val['foods'].some((item: { id: number }) =>
+						userAllergies.includes(item.id),
+					) == false
+				);
+			});
+
+			let dinnerArrOfObj = await this.convertArrayOfObject(
+				foodsByCaloriesIntake.query_dinner,
+			);
+
+			dinnerArrOfObj = dinnerArrOfObj.filter(val => {
+				return (
+					val['foods'].some((item: { id: number }) =>
+						userAllergies.includes(item.id),
+					) == false
+				);
+			});
+
+			let foodsSuggestionArr: Array<number> = [];
+
+			breakfastSuggestion = breakfastArrOfObj[
+				Math.floor(Math.random() * breakfastArrOfObj.length)
+			] as foodSuggestion;
+
+			foodsSuggestionArr.push(breakfastSuggestion.id);
+
+			do {
+				lunchSuggestion = lunchArrOfObj[
+					Math.floor(Math.random() * lunchArrOfObj.length)
+				] as foodSuggestion;
+			} while (foodsSuggestionArr.includes(lunchSuggestion.id));
+
+			foodsSuggestionArr.push(lunchSuggestion.id);
+
+			do {
+				dinnerSuggestion = dinnerArrOfObj[
+					Math.floor(Math.random() * dinnerArrOfObj.length)
+				] as foodSuggestion;
+			} while (foodsSuggestionArr.includes(dinnerSuggestion.id));
+
+			foodsSuggestionArr.push(dinnerSuggestion.id);
 
 			const recordedNutrition = await this.GetModel.getRecordedNutrition(
 				params,
@@ -97,7 +201,6 @@ export class HomeService {
 				recordedNutrition,
 				Mealtime.BREAKFAST,
 			);
-
 			const lunch = await this.foodAndQuantity(
 				recordedNutrition,
 				Mealtime.LUNCH,
@@ -143,7 +246,6 @@ export class HomeService {
 			totalCaliums = parseFloat(totalCaliums.toFixed(2));
 
 			return {
-				recordedNutrition,
 				daily_analysis: {
 					TDEE: tdee,
 					total_cals: totalCals,
@@ -160,7 +262,11 @@ export class HomeService {
 					lunch,
 					dinner,
 				},
-				// foodRecommentation: foodRecommentation,
+				food_suggestion: {
+					breakfast: breakfastSuggestion,
+					lunch: lunchSuggestion,
+					dinner: dinnerSuggestion,
+				},
 				water,
 			};
 		} catch (error) {
