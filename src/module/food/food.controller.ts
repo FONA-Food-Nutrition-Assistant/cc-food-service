@@ -12,8 +12,8 @@ import {
 // import { FastifyReply } from 'fastify';
 
 /* Other Dependencies */
-import { ResponseMessage } from 'src/common/message/message.enum';
-import { TidyResponse } from 'src/util/responseHelper';
+import { ResponseMessage } from '../../common/message/message.enum';
+import { TidyResponse } from '../../util/responseHelper';
 import { FoodService } from './food.service';
 
 /* DTO */

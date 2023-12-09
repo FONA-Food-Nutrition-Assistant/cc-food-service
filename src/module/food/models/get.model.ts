@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FoodEntity } from '../entities/food.entity';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
-import { NutritionEntity } from '../entities/nutrition.entity';
-import { UserNutritionEntity } from '../entities/user-nutrition.entity';
+
 import { BaseRequestDto } from '../dto/base-request.dto';
 import { RequestListFoodDto } from '../dto/list-food.dto';
 import { RequestListNutritionDto } from '../dto/list-nutrition.dto';
+
+import { FoodEntity } from '../entities/food.entity';
+import { NutritionEntity } from '../entities/nutrition.entity';
+import { UserNutritionEntity } from '../entities/user-nutrition.entity';
 import { FoodAllergyEntity } from '../entities/food-allergy.entity';
 import { UserAllergyEntity } from '../entities/user-allergy.entity';
 import { AllergyEntity } from '../entities/allergy.entity';
@@ -21,10 +23,16 @@ export class GetModel {
 		private readonly NutritionRepository: Repository<NutritionEntity>,
 		@InjectRepository(UserNutritionEntity)
 		private readonly UserNutritionRepository: Repository<UserNutritionEntity>,
+		@InjectRepository(UserAllergyEntity)
+		private readonly UserAllergyRepository: Repository<UserAllergyEntity>,
+		@InjectRepository(FoodAllergyEntity)
+		private readonly FoodAllergyRepository: Repository<FoodAllergyEntity>,
 	) {}
 
 	async getFood(params: RequestListFoodDto): Promise<FoodEntity[]> {
-		let query = this.FoodRepository.createQueryBuilder('food').select('*');
+		let query = this.FoodRepository.createQueryBuilder('food')
+			.select('id')
+			.addSelect('name');
 
 		if (params.id.length > 0) {
 			query = query.where('food.id IN (:...ids)', { ids: params.id });
@@ -33,9 +41,9 @@ export class GetModel {
 		if (params.search.length > 0) {
 			query = query.andWhere(
 				new Brackets(qb => {
-					params.search.forEach(keyword => {
-						qb.andWhere('LOWER(food.name) LIKE :keyword', {
-							keyword: `%${keyword.toLowerCase()}%`,
+					params.search.forEach((keyword, index) => {
+						qb.orWhere(`LOWER(food.name) LIKE :keword_${index}`, {
+							[`keword_${index}`]: `%${keyword.toLowerCase()}%`,
 						});
 					});
 				}),
@@ -51,6 +59,14 @@ export class GetModel {
 		params: RequestListNutritionDto,
 	): Promise<NutritionEntity[]> {
 		let query = this.NutritionRepository.createQueryBuilder('nu').select('*');
+		if (params.id.length > 0) {
+			query = query.where('nu.id IN (:...ids)', { ids: params.id });
+		}
+		if (params.food_id.length > 0) {
+			query = query.where('nu.food_id IN (:...foodIds)', {
+				foodIds: params.food_id,
+			});
+		}
 		query = this._defaultParams(query, params);
 		return await query.getRawMany();
 	}
@@ -82,6 +98,17 @@ export class GetModel {
 			.leftJoin(UserAllergyEntity, 'ua', 'ua.allergy_id = a.id')
 			.where('ua.user_id = :uid', { uid })
 			.andWhere('n.id in (:...ids)', { ids: nutritionIds });
+
+		return await query.getRawMany();
+	}
+
+	async getFoodsContainAllergies(uid: string): Promise<any[]> {
+		const query = this.UserAllergyRepository.createQueryBuilder('ua')
+			.select('f.id', 'id')
+			.addSelect('f.name', 'name')
+			.leftJoin(FoodAllergyEntity, 'fa', 'fa.allergy_id = ua.allergy_id')
+			.leftJoin(FoodEntity, 'f', 'f.id = fa.food_id')
+			.where('ua.user_id = :uid', { uid });
 
 		return await query.getRawMany();
 	}
