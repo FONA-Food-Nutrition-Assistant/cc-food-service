@@ -12,6 +12,8 @@ import { FoodEntity } from 'src/module/food/entities/food.entity';
 import { NutritionPacketEntity } from '../entities/nutrition_packet.entity';
 import { PacketEntity } from '../entities/packet.entity';
 import { RequestHomeDto } from '../dto/home.dto';
+import { FoodAllergyEntity } from 'src/module/food/entities/food-allergy.entity';
+import { UserAllergyEntity } from 'src/module/food/entities/user-allergy.entity';
 
 @Injectable()
 export class GetModel {
@@ -24,17 +26,16 @@ export class GetModel {
 		private readonly NutritionPacketRepository: Repository<NutritionPacketEntity>,
 		@InjectRepository(WaterEntity)
 		private readonly WaterRepository: Repository<WaterEntity>,
+		@InjectRepository(FoodEntity)
+		private readonly FoodRepository: Repository<FoodEntity>,
 	) {}
 
 	async getRecordedNutrition(params: RequestHomeDto) {
 		let query = this.UserNutritionRepository.createQueryBuilder('un')
-			.select(
-				'u.uid, un.meal_time, un.date, un.quantity, f.name, n.*, w.number_of_cups',
-			)
+			.select('u.uid, un.meal_time, un.date, un.quantity, f.name, n.*')
 			.leftJoin(NutritionEntity, 'n', 'un.nutrition_id = n.id')
 			.leftJoin(UserEntity, 'u', 'un.user_id = u.uid')
 			.leftJoin(FoodEntity, 'f', 'n.food_id = f.id')
-			.leftJoin(WaterEntity, 'w', 'w.user_id = u.uid')
 			.where('un.date = :date', { date: params.date })
 			.andWhere('u.uid = :uid', { uid: params.uid });
 
@@ -51,11 +52,12 @@ export class GetModel {
 	}
 
 	async getFoodsBasedCalorieIntake(calorieIntake: Object) {
-		console.log(calorieIntake);
 		let query_breakfast = this.NutritionPacketRepository.createQueryBuilder(
 			'np',
 		)
-			.select('p.name as packet_name, f.name as food_name, p.total_cals')
+			.select(
+				'p.id, p.name as packet_name, f.id as food_id, f.name as food_name, p.total_cals',
+			)
 			.leftJoin(PacketEntity, 'p', 'p.id = np.packet_id')
 			.leftJoin(NutritionEntity, 'n', 'n.id = np.nutrition_id')
 			.leftJoin(FoodEntity, 'f', 'f.id = n.food_id')
@@ -68,20 +70,24 @@ export class GetModel {
 			);
 
 		let query_lunch = this.NutritionPacketRepository.createQueryBuilder('np')
-			.select('p.name as packet_name, f.name as food_name, p.total_cals')
+			.select(
+				'p.id, p.name as packet_name, f.id as food_id, f.name as food_name, p.total_cals',
+			)
 			.leftJoin(PacketEntity, 'p', 'p.id = np.packet_id')
 			.leftJoin(NutritionEntity, 'n', 'n.id = np.nutrition_id')
 			.leftJoin(FoodEntity, 'f', 'f.id = n.food_id')
 			.where(
 				'p.total_cals >= :lowestLunchIntake and p.total_cals <= :highestLunchIntake',
 				{
-					lowestLunchIntake: calorieIntake['lowestLunchIntake'],
-					highestLunchIntake: calorieIntake['highestLunchIntake'],
+					lowestLunchIntake: calorieIntake['lowestDinnerIntake'],
+					highestLunchIntake: calorieIntake['highestDinnerIntake'],
 				},
 			);
 
 		let query_dinner = this.NutritionPacketRepository.createQueryBuilder('np')
-			.select('p.name as packet_name, f.name as food_name, p.total_cals')
+			.select(
+				'p.id, p.name as packet_name, f.id as food_id, f.name as food_name, p.total_cals',
+			)
 			.leftJoin(PacketEntity, 'p', 'p.id = np.packet_id')
 			.leftJoin(NutritionEntity, 'n', 'n.id = np.nutrition_id')
 			.leftJoin(FoodEntity, 'f', 'f.id = n.food_id')
@@ -101,10 +107,20 @@ export class GetModel {
 	}
 
 	async getUserById(uid: string) {
-		const result = this.UserRepository.createQueryBuilder('user')
-			.select('*')
+		let query = this.UserRepository.createQueryBuilder('u')
+			.select('u.*')
 			.where('uid = :uid', { uid });
 
-		return await result.getRawOne();
+		return await query.getRawOne();
+	}
+
+	async getFoodsByUserAllergies(uid: string) {
+		let query = this.FoodRepository.createQueryBuilder('f')
+			.select('f.id')
+			.leftJoin(FoodAllergyEntity, 'fa', 'fa.food_id = f.id')
+			.leftJoin(UserAllergyEntity, 'ua', 'ua.allergy_id = fa.allergy_id')
+			.where('ua.user_id = :uid', { uid });
+
+		return await query.getRawMany();
 	}
 }
