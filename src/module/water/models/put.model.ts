@@ -2,9 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { WaterEntity } from '../entities/water.entity';
-import { error } from 'console';
-import { ResponseMessage } from 'src/common/message/message.enum';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { RequestUpdateRecordWaterDto } from '../dto/update-water.dto';
 
 @Injectable()
 export class PutModel {
@@ -13,36 +11,22 @@ export class PutModel {
 		private readonly WaterRepository: Repository<WaterEntity>,
 	) {}
 
-	async updateWaterById({ params, uid }) {
+	async updateRecordWater(params: RequestUpdateRecordWaterDto) {
 		try {
-			const checker = await this.WaterRepository.createQueryBuilder('water')
-				.andWhere('user_id = :uid', { uid: uid })
-				.andWhere('date = :date', { date: params.date })
-				.getRawOne();
-
-			if (!checker) {
-				throw new HttpException(
-					ResponseMessage.ERR_WATER_DATA_HAS_NOT_BEEN_REGISTERED,
-					HttpStatus.BAD_REQUEST,
-				);
-			}
-
-			const updatedData = {
-				...params,
+			const water: Object = {
+				user_id: params.uid,
+				number_of_cups: params.number_of_cups,
+				date: params.date,
 			};
 
-			const result = await this.WaterRepository.createQueryBuilder()
+			const query = this.WaterRepository.createQueryBuilder()
 				.update()
-				.set(updatedData)
-				.where('user_id = :uid', { uid: uid })
+				.set(water)
+				.where('user_id = :uid', { uid: params.uid })
 				.andWhere('date = :date', { date: params.date })
-				.execute()
-				.catch(error => {
-					console.error('Error while updating:', error);
-					throw error; // Rethrow the error to handle it where the function is called
-				});
+				.returning('*');
 
-			return updatedData;
+			return await query.execute();
 		} catch (error) {
 			throw error;
 		}
