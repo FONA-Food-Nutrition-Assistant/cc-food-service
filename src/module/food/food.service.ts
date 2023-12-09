@@ -14,7 +14,6 @@ import {
 } from './dto/list-nutrition.dto';
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { Console } from 'console';
 
 @Injectable()
 export class FoodService {
@@ -41,16 +40,25 @@ export class FoodService {
 				return [] as ResponseFoodDetailDto[];
 			}
 
+			const foodsContainAllergies =
+				await this.GetModel.getFoodsContainAllergies(params.uid);
+
+			const foodsContainAllergiesId = foodsContainAllergies.map(
+				food => food.id,
+			);
+
 			const nutrition = await this.GetModel.getNutritionByFoodIds(
 				food.map(food => food.id),
 			);
 
 			const data = food.map(food => {
+				const isUserAllergy = foodsContainAllergiesId.includes(food.id);
 				const tempNutrition = nutrition.filter(
 					nutrition => nutrition.food_id === food.id,
 				);
 				return {
 					...food,
+					is_user_allergy: isUserAllergy,
 					nutritions: tempNutrition,
 				} as ResponseFoodDetailDto;
 			});

@@ -1,15 +1,20 @@
 import { Module } from '@nestjs/common';
-import { FoodController } from './food.controller';
-import { FoodService } from './food.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserNutritionEntity } from './entities/user-nutrition.entity';
+
+import { FoodController } from './food.controller';
+
+import { FoodService } from './food.service';
+
 import { PostModel } from './models/post.model';
 import { PutModel } from './models/put.model';
+import { GetModel } from './models/get.model';
+import { DeleteModel } from './models/delete.model';
+
+import { UserNutritionEntity } from './entities/user-nutrition.entity';
 import { NutritionEntity } from './entities/nutrition.entity';
 import { FoodEntity } from './entities/food.entity';
-import { GetModel } from './models/get.model';
 import { UserAllergyEntity } from './entities/user-allergy.entity';
-import { DeleteModel } from './models/delete.model';
+import { FoodAllergyEntity } from './entities/food-allergy.entity';
 
 @Module({
 	imports: [
@@ -18,6 +23,7 @@ import { DeleteModel } from './models/delete.model';
 			NutritionEntity,
 			UserNutritionEntity,
 			UserAllergyEntity,
+			FoodAllergyEntity,
 		]),
 	],
 	controllers: [FoodController],

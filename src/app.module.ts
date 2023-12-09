@@ -8,6 +8,7 @@ import { RequestLoggerMiddleware } from './common/middleware/request-logger.midd
 import { UidCheckerMiddleware } from './common/middleware/uid-checker.middleware';
 import { WaterModule } from './module/water/water.module';
 import { FoodModule } from './module/food/food.module';
+import { AllergyModule } from './module/allergy/allergy.module';
 
 @Module({
 	imports: [
@@ -30,6 +31,7 @@ import { FoodModule } from './module/food/food.module';
 			entities: [__dirname + '/**/*.entity{.ts,.js}'],
 			synchronize: false,
 		}),
+		AllergyModule,
 	],
 	controllers: [],
 	providers: [
