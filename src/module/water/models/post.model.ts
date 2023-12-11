@@ -1,30 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { WaterEntity } from '../entities/water.entity';
 import { RequestCreateRecordWaterDto } from '../dto/create-water.dto';
 
 @Injectable()
 export class PostModel {
 	constructor(
+		private readonly dataSource: DataSource,
 		@InjectRepository(WaterEntity)
 		private readonly WaterRepository: Repository<WaterEntity>,
 	) {}
 
-	async createRecordWater(params: RequestCreateRecordWaterDto) {
+	async createRecordWater(
+		params: RequestCreateRecordWaterDto,
+		em: EntityManager = this.dataSource.manager,
+	) {
 		try {
-			const water: Object = {
+			const newRecordWater: Object = {
 				user_id: params.uid,
 				number_of_cups: params.number_of_cups,
 				date: params.date,
 			};
 
-			const query = this.WaterRepository.createQueryBuilder()
-				.insert()
-				.values(water)
-				.returning('id');
-
-			return await query.execute();
+			return await em.save(WaterEntity, newRecordWater);
 		} catch (error) {
 			throw error;
 		}

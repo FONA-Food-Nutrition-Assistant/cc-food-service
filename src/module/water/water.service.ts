@@ -11,6 +11,9 @@ import {
 	ResponseCreateRecordWaterDto,
 } from './dto/create-water.dto';
 import { ResponseMessage } from 'src/common/message/message.enum';
+import { runInTransaction } from 'src/db/run-in-transaction';
+
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class WaterService {
@@ -18,23 +21,26 @@ export class WaterService {
 		private readonly PutModel: PutModel,
 		private readonly PostModel: PostModel,
 		private readonly GetModel: GetModel,
+		private readonly dataSource: DataSource,
 	) {}
 
 	async createRecordWater(params: RequestCreateRecordWaterDto) {
 		try {
-			const checkRegisteredWater = await this.GetModel.checkRegisteredWater(
-				params,
-			);
-
-			if (checkRegisteredWater) {
-				throw new HttpException(
-					ResponseMessage.ERR_FOOD_DATA_HAS_BEEN_REGISTERED,
-					HttpStatus.BAD_REQUEST,
+			return await runInTransaction(this.dataSource, async em => {
+				const checkRegisteredWater = await this.GetModel.checkRegisteredWater(
+					params,
 				);
-			}
 
-			const data = await this.PostModel.createRecordWater(params);
-			return data as ResponseUpdateRecordWaterDto;
+				if (checkRegisteredWater) {
+					throw new HttpException(
+						ResponseMessage.ERR_FOOD_DATA_HAS_BEEN_REGISTERED,
+						HttpStatus.BAD_REQUEST,
+					);
+				}
+
+				const data = await this.PostModel.createRecordWater(params, em);
+				return data;
+			});
 		} catch (error) {
 			throw error;
 		}
@@ -42,19 +48,25 @@ export class WaterService {
 
 	async updateRecordWater(params: RequestUpdateRecordWaterDto) {
 		try {
-			const checkRegisteredWater = await this.GetModel.checkRegisteredWater(
-				params,
-			);
-
-			if (!checkRegisteredWater) {
-				throw new HttpException(
-					ResponseMessage.ERR_FOOD_DATA_HAS_NOT_BEEN_REGISTERED,
-					HttpStatus.BAD_REQUEST,
+			return await runInTransaction(this.dataSource, async em => {
+				const checkRegisteredWater = await this.GetModel.checkRegisteredWater(
+					params,
 				);
-			}
 
-			const data = await this.PutModel.updateRecordWater(params);
-			return data as ResponseUpdateRecordWaterDto;
+				if (!checkRegisteredWater) {
+					throw new HttpException(
+						ResponseMessage.ERR_FOOD_DATA_HAS_NOT_BEEN_REGISTERED,
+						HttpStatus.BAD_REQUEST,
+					);
+				}
+
+				const data = await this.PutModel.updateRecordWater(
+					params,
+					checkRegisteredWater,
+					em,
+				);
+				return data;
+			});
 		} catch (error) {
 			throw error;
 		}

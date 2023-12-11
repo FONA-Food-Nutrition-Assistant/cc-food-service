@@ -15,7 +15,8 @@ export class GetModel {
 	async checkRegisteredWater(
 		params: RequestCreateRecordWaterDto | RequestUpdateRecordWaterDto,
 	) {
-		let query = this.WaterRepository.createQueryBuilder('water')
+		let query = this.WaterRepository.createQueryBuilder()
+			.select('*')
 			.where('user_id = :uid', { uid: params.uid })
 			.andWhere('date = :date', { date: params.date });
 
