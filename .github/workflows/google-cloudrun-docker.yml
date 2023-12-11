@@ -24,9 +24,9 @@ jobs:
         env:
           GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
         run: |
-          gcloud auth configure-docker asia-southeast1-docker.pkg.dev
-          docker build -t asia-southeast1-docker.pkg.dev/bangkit-fona-development/fona-microservices/food-service .
-          docker push asia-southeast1-docker.pkg.dev/bangkit-fona-development/fona-microservices/food-service
+          gcloud auth configure-docker ${{ secrets.GOOGLE_AUTH }}
+          docker build -t ${{ secrets.ARTIFACT_REGISTRY }}/${{ secrets.SERVICE_NAME }} .
+          docker push ${{ secrets.ARTIFACT_REGISTRY }}/${{ secrets.SERVICE_NAME }}
 
       - name: deploy to cloud run
         env:
