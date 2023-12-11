@@ -17,17 +17,13 @@ export class PutModel {
 		checkRegisteredWater: WaterEntity,
 		em: EntityManager = this.dataSource.manager,
 	): Promise<any> {
-		try {
-			const { number_of_cups } = params;
+		const { number_of_cups } = params;
 
-			const recordWater = {
-				...checkRegisteredWater,
-				number_of_cups,
-			};
+		const recordWater = {
+			...checkRegisteredWater,
+			number_of_cups,
+		};
 
-			return await em.save(WaterEntity, recordWater);
-		} catch (error) {
-			throw error;
-		}
+		return await em.save(WaterEntity, recordWater);
 	}
 }

@@ -16,16 +16,12 @@ export class PostModel {
 		params: RequestCreateRecordWaterDto,
 		em: EntityManager = this.dataSource.manager,
 	) {
-		try {
-			const newRecordWater: Object = {
-				user_id: params.uid,
-				number_of_cups: params.number_of_cups,
-				date: params.date,
-			};
+		const newRecordWater: Object = {
+			user_id: params.uid,
+			number_of_cups: params.number_of_cups,
+			date: params.date,
+		};
 
-			return await em.save(WaterEntity, newRecordWater);
-		} catch (error) {
-			throw error;
-		}
+		return await em.save(WaterEntity, newRecordWater);
 	}
 }
