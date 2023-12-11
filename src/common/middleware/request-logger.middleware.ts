@@ -14,7 +14,7 @@ export class RequestLoggerMiddleware implements NestMiddleware {
 			query,
 		};
 
-		Logger.log(`[${method}] ${url} ${JSON.stringify(data)}`);
+		Logger.log(`${url} ${JSON.stringify(data)}`, `${method}`);
 		next();
 	}
 }

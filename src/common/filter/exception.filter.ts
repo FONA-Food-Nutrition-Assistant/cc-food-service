@@ -13,8 +13,7 @@ import { ServerResponse } from 'http';
 @Catch()
 export class AllExceptionsFilter extends BaseExceptionFilter {
 	catch(exception: any, host: ArgumentsHost): void {
-		Logger.error(exception);
-		console.log(exception);
+		Logger.error(exception.message, 'AllExceptionsFilter');
 
 		const ctx = host.switchToHttp();
 		const response = ctx.getResponse();
