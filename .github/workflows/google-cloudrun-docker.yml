@@ -24,7 +24,7 @@ jobs:
         env:
           GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
         run: |
-          gcloud auth configure-docker asia-southeast2-docker.pkg.dev
+          gcloud auth configure-docker asia-southeast1-docker.pkg.dev
           docker build -t asia-southeast1-docker.pkg.dev/bangkit-fona-development/fona-microservices/food-service .
           docker push asia-southeast1-docker.pkg.dev/bangkit-fona-development/fona-microservices/food-service
 
