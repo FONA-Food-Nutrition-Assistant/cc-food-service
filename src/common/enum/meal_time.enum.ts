@@ -1,5 +1,5 @@
 export enum Mealtime {
-	BREAKFAST = 'Breakfast',
-	LUNCH = 'Lunch',
-	DINNER = 'Dinner',
+	BREAKFAST = 'Sarapan',
+	LUNCH = 'Makan Siang',
+	DINNER = 'Makan Malam',
 }

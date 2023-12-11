@@ -1,7 +1,7 @@
 export enum Activity {
-	SEDENTARY = 'Sedentary',
-	LIGHTLY = 'Lightly Active',
-	MODERATELY = 'Moderately Active',
-	VERY = 'Very Active',
-	EXTRA = 'Extremely Active',
+	SEDENTARY = 'Tidak Aktif',
+	LIGHTLY = 'Sedikit Aktif',
+	MODERATELY = 'Cukup Aktif',
+	VERY = 'Sangat Aktif',
+	EXTRA = 'Ekstra Aktif',
 }

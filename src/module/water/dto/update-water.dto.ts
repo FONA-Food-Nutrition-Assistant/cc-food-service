@@ -19,15 +19,11 @@ export class RequestUpdateRecordWaterDto extends BaseRequestDto {
 	date: string;
 }
 
-class ResponseRawRecordWaterDto {
+export class ResponseUpdateRecordWaterDto {
 	id: number;
 	user_id: string;
 	number_of_cups: number;
-	date: string;
-	created_at: string;
-	updated_at: string;
-}
-
-export class ResponseUpdateRecordWaterDto {
-	raw: ResponseRawRecordWaterDto[];
+	date: Date;
+	created_at: Date;
+	updated_at: Date;
 }
