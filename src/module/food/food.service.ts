@@ -22,6 +22,8 @@ import {
 	RequestCreateRecordFoodDto,
 	ResponseCreateRecordFoodDto,
 } from './dto/create-record-food.dto';
+import { runInTransaction } from '../../db/run-in-transaction';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class FoodService {
@@ -30,6 +32,7 @@ export class FoodService {
 		private readonly PostModel: PostModel,
 		private readonly GetModel: GetModel,
 		private readonly DeleteModel: DeleteModel,
+		private readonly dataSource: DataSource,
 	) {}
 
 	async getFood(params: RequestListFoodDto) {
@@ -79,36 +82,37 @@ export class FoodService {
 
 	async storeRecordFood(params: RequestCreateRecordFoodDto) {
 		try {
-			const checkRegisteredNutritions =
-				await this.GetModel.checkRegisteredNutrition(params);
+			return await runInTransaction(this.dataSource, async em => {
+				const checkRegisteredNutritions =
+					await this.GetModel.checkRegisteredNutrition(params);
 
-			if (checkRegisteredNutritions) {
-				throw new HttpException(
-					ResponseMessage.ERR_FOOD_DATA_HAS_BEEN_REGISTERED,
-					HttpStatus.BAD_REQUEST,
-				);
-			}
+				if (checkRegisteredNutritions) {
+					throw new HttpException(
+						ResponseMessage.ERR_FOOD_DATA_HAS_BEEN_REGISTERED,
+						HttpStatus.BAD_REQUEST,
+					);
+				}
 
-			await this.DeleteModel.deleteUserNutritions(params);
+				await this.DeleteModel.deleteUserNutritions(params, em);
 
-			const data = await this.PostModel.storeFood(params);
+				const data = await this.PostModel.storeFood(params, em);
 
-			const foods = params.foods.map(food => food.nutrition_id);
+				const foods = params.foods.map(food => food.nutrition_id);
 
-			let foodsContainAllergies = await this.GetModel.checkNutritionsAllergies(
-				foods,
-				params.uid,
-			);
+				let foodsContainAllergies =
+					await this.GetModel.checkNutritionsAllergies(foods, params.uid);
 
-			foodsContainAllergies = foodsContainAllergies.map(val => val.food);
+				foodsContainAllergies = foodsContainAllergies.map(val => val.food);
 
-			const isFoodsContainAllergies = foodsContainAllergies.length > 0 || false;
+				const isFoodsContainAllergies =
+					foodsContainAllergies.length > 0 || false;
 
-			return {
-				is_foods_contain_allergies: isFoodsContainAllergies,
-				foods_contain_allergies: foodsContainAllergies,
-				data,
-			} as ResponseCreateRecordFoodDto;
+				return {
+					is_foods_contain_allergies: isFoodsContainAllergies,
+					foods_contain_allergies: foodsContainAllergies,
+					data,
+				} as ResponseCreateRecordFoodDto;
+			});
 		} catch (error) {
 			throw error;
 		}

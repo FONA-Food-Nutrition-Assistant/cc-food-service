@@ -1,20 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { UserNutritionEntity } from '../entities/user-nutrition.entity';
 import { RequestCreateRecordFoodDto } from '../dto/create-record-food.dto';
+import { FoodEntity } from '../entities/food.entity';
 
 @Injectable()
 export class PostModel {
 	constructor(
+		private readonly dataSource: DataSource,
 		@InjectRepository(UserNutritionEntity)
 		private readonly UserNutritionRepository: Repository<UserNutritionEntity>,
 	) {}
 
-	async storeFood(params: RequestCreateRecordFoodDto) {
+	async storeFood(
+		params: RequestCreateRecordFoodDto,
+		em: EntityManager = this.dataSource.manager,
+	) {
 		let userNutrition: UserNutritionEntity;
 		let data: Object[] = [];
-		const nutritionRepo = this.UserNutritionRepository;
 
 		params.foods.forEach(async function (food) {
 			userNutrition = {
@@ -27,11 +31,7 @@ export class PostModel {
 
 			data.push(userNutrition);
 
-			await nutritionRepo
-				.createQueryBuilder()
-				.insert()
-				.values(userNutrition)
-				.execute();
+			return await em.save(UserNutritionEntity, userNutrition);
 		});
 
 		return data as Object[];

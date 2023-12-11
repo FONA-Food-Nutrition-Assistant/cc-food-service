@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { UserNutritionEntity } from '../entities/user-nutrition.entity';
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
@@ -9,14 +9,17 @@ import { RequestUpdateRecordFoodDto } from '../dto/update-record-food.dto';
 @Injectable()
 export class PutModel {
 	constructor(
+		private readonly dataSource: DataSource,
 		@InjectRepository(UserNutritionEntity)
 		private readonly UserNutritionRepository: Repository<UserNutritionEntity>,
 	) {}
 
-	async updateFood(params: RequestUpdateRecordFoodDto) {
+	async updateFood(
+		params: RequestUpdateRecordFoodDto,
+		em: EntityManager = this.dataSource.manager,
+	): Promise<any> {
 		let userNutrition: UserNutritionEntity;
 		let data: Object[] = [];
-		const nutritionRepo = this.UserNutritionRepository;
 
 		params.foods.forEach(async function (food) {
 			userNutrition = {
@@ -29,11 +32,7 @@ export class PutModel {
 
 			data.push(userNutrition);
 
-			await nutritionRepo
-				.createQueryBuilder()
-				.insert()
-				.values(userNutrition)
-				.execute();
+			return await em.save(UserNutritionEntity, userNutrition);
 		});
 
 		return data as Object[];
