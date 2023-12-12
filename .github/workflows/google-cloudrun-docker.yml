@@ -1,4 +1,4 @@
-name: Deploy Cloud Run
+name: Deploy Food Service to Cloud Run
 
 on:
   push:
@@ -9,7 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Code checkout
+      - name: Code Checkout
         uses: actions/checkout@v2
 
       - name: Install the gcloud CLI
