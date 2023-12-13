@@ -210,10 +210,10 @@ export class HomeService {
 				Mealtime.DINNER,
 			);
 
-			let water = await this.GetModel.getRecordedWater(params);
+			let recordWater = await this.GetModel.getRecordedWater(params);
 
-			if (!water) {
-				water = null;
+			if (!recordWater) {
+				recordWater = null;
 			}
 
 			let totalCals: number = 0;
@@ -267,7 +267,7 @@ export class HomeService {
 					lunch: lunchSuggestion,
 					dinner: dinnerSuggestion,
 				},
-				water,
+				record_water: recordWater,
 			};
 		} catch (error) {
 			throw error;
