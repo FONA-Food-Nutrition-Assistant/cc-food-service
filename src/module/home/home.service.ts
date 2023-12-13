@@ -34,10 +34,10 @@ export class HomeService {
 			.filter((food: { meal_time: Mealtime }) => {
 				return food.meal_time == meal_time;
 			})
-			.map((food: { name: string; quantity: number }) => {
+			.map((food: { name: any; cals: number; quantity: number }) => {
 				return {
 					name: food.name,
-					quantity: food.quantity,
+					total_cals: food.cals * food.quantity,
 				};
 			});
 	}
@@ -117,6 +117,13 @@ export class HomeService {
 				);
 
 			const tdee = await this.getTdee(user);
+
+			const dailyNeeds: Object = {
+				TDEE: tdee,
+				proteins: (0.1 * tdee).toFixed(2),
+				fats: (0.2 * tdee).toFixed(2),
+				carbos: (0.45 * tdee).toFixed(2),
+			};
 
 			let calorieIntake = await this.calorieIntake(tdee);
 
@@ -212,6 +219,8 @@ export class HomeService {
 
 			let recordWater = await this.GetModel.getRecordedWater(params);
 
+			recordWater = recordWater.number_of_cups;
+
 			if (!recordWater) {
 				recordWater = null;
 			}
@@ -246,8 +255,8 @@ export class HomeService {
 			totalCaliums = parseFloat(totalCaliums.toFixed(2));
 
 			return {
+				daily_needs: dailyNeeds,
 				daily_analysis: {
-					TDEE: tdee,
 					total_cals: totalCals,
 					total_carbos: totalCarbos,
 					total_proteins: totalProteins,
