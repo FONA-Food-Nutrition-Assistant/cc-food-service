@@ -48,7 +48,7 @@ export class GetModel {
 			.where('date = :date', { date: params.date })
 			.andWhere('user_id = :uid', { uid: params.uid });
 
-		return await query.getRawMany();
+		return await query.getRawOne();
 	}
 
 	async getFoodsBasedCalorieIntake(calorieIntake: Object) {
