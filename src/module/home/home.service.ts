@@ -109,7 +109,6 @@ export class HomeService {
 	async getAllData(params: RequestHomeDto) {
 		try {
 			// start retrieving user data and user daily needs
-
 			const user = await this.GetModel.getUserById(params.uid);
 
 			if (!user)
@@ -233,6 +232,10 @@ export class HomeService {
 				dinner,
 			};
 
+			// end getting user recorded foods
+
+			// start getting user recorded water
+
 			let recordWater = await this.GetModel.getRecordedWater(params);
 
 			if (!recordWater) {
@@ -240,6 +243,10 @@ export class HomeService {
 			} else {
 				recordWater = recordWater.number_of_cups;
 			}
+
+			// end getting user recorded foods
+
+			// start calculating user recorded nutritions
 
 			let totalCals: number = 0;
 			let totalCarbos: number = 0;
@@ -269,6 +276,8 @@ export class HomeService {
 			totalGlucoses = parseFloat(totalGlucoses.toFixed(2));
 			totalSodiums = parseFloat(totalSodiums.toFixed(2));
 			totalCaliums = parseFloat(totalCaliums.toFixed(2));
+
+			// end calculating user recorded nutritions
 
 			return {
 				daily_needs: dailyNeeds,
