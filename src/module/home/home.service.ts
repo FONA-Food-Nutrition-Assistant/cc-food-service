@@ -34,12 +34,32 @@ export class HomeService {
 			.filter((food: { meal_time: Mealtime }) => {
 				return food.meal_time == meal_time;
 			})
-			.map((food: { name: any; cals: number; quantity: number }) => {
-				return {
-					name: food.name,
-					total_cals: food.cals * food.quantity,
-				};
-			});
+			.map(
+				(food: {
+					name: string;
+					cals: number;
+					quantity: number;
+					carbos: number;
+					proteins: number;
+					fibers: number;
+					fats: number;
+					glucoses: number;
+					sodiums: number;
+					caliums: number;
+				}) => {
+					return {
+						name: food.name,
+						total_cals: food.cals * food.quantity,
+						total_carbos: food.carbos * food.quantity,
+						total_proteins: food.proteins * food.quantity,
+						total_fibers: food.fibers * food.quantity,
+						total_fats: food.fats * food.quantity,
+						total_glucoses: food.glucoses * food.quantity,
+						total_sodiums: food.sodiums * food.quantity,
+						total_caliums: food.caliums * food.quantity,
+					};
+				},
+			);
 	}
 
 	async getTdee(user: UserEntity) {
@@ -217,19 +237,36 @@ export class HomeService {
 				recordedNutrition,
 				Mealtime.BREAKFAST,
 			);
+
 			const lunch = await this.foodAndQuantity(
 				recordedNutrition,
 				Mealtime.LUNCH,
 			);
+
 			const dinner = await this.foodAndQuantity(
 				recordedNutrition,
 				Mealtime.DINNER,
 			);
 
 			const recordFoods = {
-				breakfast,
-				lunch,
-				dinner,
+				breakfast: breakfast.map(val => {
+					return {
+						name: val.name,
+						als: val.total_cals,
+					};
+				}),
+				lunch: lunch.map(val => {
+					return {
+						name: val.name,
+						cals: val.total_cals,
+					};
+				}),
+				dinner: dinner.map(val => {
+					return {
+						name: val.name,
+						cals: val.total_cals,
+					};
+				}),
 			};
 
 			// end getting user recorded foods
@@ -257,15 +294,37 @@ export class HomeService {
 			let totalSodiums: number = 0;
 			let totalCaliums: number = 0;
 
-			recordedNutrition.forEach(food => {
-				totalCals += food.cals;
-				totalCarbos += food.carbos;
-				totalProteins += food.proteins;
-				totalFibers += food.fibers;
-				totalFats += food.fats;
-				totalGlucoses += food.glucoses;
-				totalSodiums += food.sodiums;
-				totalCaliums += food.caliums;
+			breakfast.forEach(food => {
+				totalCals += food.total_cals;
+				totalCarbos += food.total_carbos;
+				totalProteins += food.total_proteins;
+				totalFibers += food.total_fibers;
+				totalFats += food.total_fats;
+				totalGlucoses += food.total_glucoses;
+				totalSodiums += food.total_sodiums;
+				totalCaliums += food.total_caliums;
+			});
+
+			lunch.forEach(food => {
+				totalCals += food.total_cals;
+				totalCarbos += food.total_carbos;
+				totalProteins += food.total_proteins;
+				totalFibers += food.total_fibers;
+				totalFats += food.total_fats;
+				totalGlucoses += food.total_glucoses;
+				totalSodiums += food.total_sodiums;
+				totalCaliums += food.total_caliums;
+			});
+
+			dinner.forEach(food => {
+				totalCals += food.total_cals;
+				totalCarbos += food.total_carbos;
+				totalProteins += food.total_proteins;
+				totalFibers += food.total_fibers;
+				totalFats += food.total_fats;
+				totalGlucoses += food.total_glucoses;
+				totalSodiums += food.total_sodiums;
+				totalCaliums += food.total_caliums;
 			});
 
 			totalCals = parseFloat(totalCals.toFixed(2));
@@ -302,9 +361,9 @@ export class HomeService {
 				record_foods: recordFoods,
 				record_water: recordWater,
 				food_suggestion: {
-					breakfast: breakfastSuggestion,
-					lunch: lunchSuggestion,
-					dinner: dinnerSuggestion,
+					sarapan: breakfastSuggestion,
+					makan_siang: lunchSuggestion,
+					makan_malam: dinnerSuggestion,
 				},
 			};
 		} catch (error) {
