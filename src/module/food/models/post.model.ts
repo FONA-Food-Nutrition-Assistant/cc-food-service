@@ -16,7 +16,7 @@ export class PostModel {
 	async storeFood(
 		params: RequestCreateRecordFoodDto,
 		em: EntityManager = this.dataSource.manager,
-	) {
+	): Promise<any> {
 		let userNutrition: UserNutritionEntity;
 		let data: Object[] = [];
 
