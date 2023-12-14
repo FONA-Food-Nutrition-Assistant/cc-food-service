@@ -252,7 +252,7 @@ export class HomeService {
 				breakfast: breakfast.map(val => {
 					return {
 						name: val.name,
-						als: val.total_cals,
+						cals: val.total_cals,
 					};
 				}),
 				lunch: lunch.map(val => {
