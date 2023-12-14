@@ -280,6 +280,14 @@ export class HomeService {
 			// end calculating user recorded nutritions
 
 			return {
+				calorie_intake: {
+					lowest_breakfast_intake: calorieIntake.lowestBreakfastIntake,
+					highest_breakfast_intake: calorieIntake.highestBreakfastIntake,
+					lowest_lunch_intake: calorieIntake.lowestLunchIntake,
+					highest_lunch_intake: calorieIntake.highestLunchIntake,
+					lowest_dinner_intake: calorieIntake.lowestDinnerIntake,
+					highest_dinner_intake: calorieIntake.highestDinnerIntake,
+				},
 				daily_needs: dailyNeeds,
 				daily_analysis: {
 					total_cals: totalCals,
@@ -292,12 +300,12 @@ export class HomeService {
 					total_caliums: totalCaliums,
 				},
 				record_foods: recordFoods,
+				record_water: recordWater,
 				food_suggestion: {
 					breakfast: breakfastSuggestion,
 					lunch: lunchSuggestion,
 					dinner: dinnerSuggestion,
 				},
-				record_water: recordWater,
 			};
 		} catch (error) {
 			throw error;
