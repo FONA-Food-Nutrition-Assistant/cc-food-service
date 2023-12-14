@@ -108,6 +108,7 @@ export class HomeService {
 
 	async getAllData(params: RequestHomeDto) {
 		try {
+			// start retrieving user data and user daily needs
 			const user = await this.GetModel.getUserById(params.uid);
 
 			if (!user)
@@ -124,6 +125,10 @@ export class HomeService {
 				fats: (0.2 * tdee).toFixed(2),
 				carbos: (0.45 * tdee).toFixed(2),
 			};
+
+			// end retrieving user data and user daily needs
+
+			// start getting user foods suggestion
 
 			let calorieIntake = await this.calorieIntake(tdee);
 
@@ -200,6 +205,10 @@ export class HomeService {
 
 			foodsSuggestionArr.push(dinnerSuggestion.id);
 
+			// end getting user foods suggestion
+
+			// start getting user recorded foods
+
 			const recordedNutrition = await this.GetModel.getRecordedNutrition(
 				params,
 			);
@@ -217,13 +226,27 @@ export class HomeService {
 				Mealtime.DINNER,
 			);
 
+			const recordFoods = {
+				breakfast,
+				lunch,
+				dinner,
+			};
+
+			// end getting user recorded foods
+
+			// start getting user recorded water
+
 			let recordWater = await this.GetModel.getRecordedWater(params);
 
-			recordWater = recordWater.number_of_cups;
-
 			if (!recordWater) {
-				recordWater = null;
+				recordWater = 0;
+			} else {
+				recordWater = recordWater.number_of_cups;
 			}
+
+			// end getting user recorded foods
+
+			// start calculating user recorded nutritions
 
 			let totalCals: number = 0;
 			let totalCarbos: number = 0;
@@ -254,6 +277,8 @@ export class HomeService {
 			totalSodiums = parseFloat(totalSodiums.toFixed(2));
 			totalCaliums = parseFloat(totalCaliums.toFixed(2));
 
+			// end calculating user recorded nutritions
+
 			return {
 				daily_needs: dailyNeeds,
 				daily_analysis: {
@@ -266,11 +291,7 @@ export class HomeService {
 					total_sodiums: totalSodiums,
 					total_caliums: totalCaliums,
 				},
-				record_foods: {
-					breakfast,
-					lunch,
-					dinner,
-				},
+				record_foods: recordFoods,
 				food_suggestion: {
 					breakfast: breakfastSuggestion,
 					lunch: lunchSuggestion,

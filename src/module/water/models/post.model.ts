@@ -15,7 +15,7 @@ export class PostModel {
 	async createRecordWater(
 		params: RequestCreateRecordWaterDto,
 		em: EntityManager = this.dataSource.manager,
-	) {
+	): Promise<WaterEntity> {
 		const newRecordWater: Object = {
 			user_id: params.uid,
 			number_of_cups: params.number_of_cups,

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, EntityManager, Repository } from 'typeorm';
+import { DataSource, DeleteResult, EntityManager, Repository } from 'typeorm';
 import { UserNutritionEntity } from '../entities/user-nutrition.entity';
 import { RequestUpdateRecordFoodDto } from '../dto/update-record-food.dto';
 
@@ -15,7 +15,7 @@ export class DeleteModel {
 	async deleteUserNutritions(
 		params: RequestUpdateRecordFoodDto,
 		em: EntityManager = this.dataSource.manager,
-	) {
+	): Promise<DeleteResult> {
 		return await em.delete(UserNutritionEntity, {
 			user_id: params.uid,
 			date: params.date,
