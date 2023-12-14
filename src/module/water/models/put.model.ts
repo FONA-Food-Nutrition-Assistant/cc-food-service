@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, EntityManager, Repository, UpdateResult } from 'typeorm';
+import {
+	DataSource,
+	EntityManager,
+	Repository,
+	UpdateDescription,
+	UpdateResult,
+} from 'typeorm';
 import { WaterEntity } from '../entities/water.entity';
 import { RequestUpdateRecordWaterDto } from '../dto/update-water.dto';
 
@@ -16,7 +22,7 @@ export class PutModel {
 		params: RequestUpdateRecordWaterDto,
 		checkRegisteredWater: WaterEntity,
 		em: EntityManager = this.dataSource.manager,
-	): Promise<any> {
+	): Promise<UpdateResult> {
 		const { number_of_cups } = params;
 
 		const recordWater = {
@@ -24,6 +30,10 @@ export class PutModel {
 			number_of_cups,
 		};
 
-		return await em.save(WaterEntity, recordWater);
+		return await em.update(
+			WaterEntity,
+			{ id: checkRegisteredWater.id },
+			recordWater,
+		);
 	}
 }
