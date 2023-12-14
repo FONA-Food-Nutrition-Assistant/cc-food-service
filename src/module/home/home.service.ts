@@ -121,9 +121,9 @@ export class HomeService {
 
 			const dailyNeeds: Object = {
 				TDEE: tdee,
-				proteins: (0.1 * tdee).toFixed(2),
-				fats: (0.2 * tdee).toFixed(2),
-				carbos: (0.45 * tdee).toFixed(2),
+				proteins: parseFloat((0.1 * tdee).toFixed(2)),
+				fats: parseFloat((0.2 * tdee).toFixed(2)),
+				carbos: parseFloat((0.45 * tdee).toFixed(2)),
 			};
 
 			// end retrieving user data and user daily needs
