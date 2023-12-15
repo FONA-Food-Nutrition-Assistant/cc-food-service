@@ -57,13 +57,27 @@ export class HomeService {
 						serving_size: nutrition.serving_size,
 						quantity: nutrition.quantity,
 						total_cals: nutrition.cals * nutrition.quantity,
-						total_carbos: nutrition.carbos * nutrition.quantity,
-						total_proteins: nutrition.proteins * nutrition.quantity,
-						total_fibers: nutrition.fibers * nutrition.quantity,
-						total_fats: nutrition.fats * nutrition.quantity,
-						total_glucoses: nutrition.glucoses * nutrition.quantity,
-						total_sodiums: nutrition.sodiums * nutrition.quantity,
-						total_caliums: nutrition.caliums * nutrition.quantity,
+						total_carbos: parseFloat(
+							(nutrition.carbos * nutrition.quantity).toFixed(2),
+						),
+						total_proteins: parseFloat(
+							(nutrition.proteins * nutrition.quantity).toFixed(2),
+						),
+						total_fibers: parseFloat(
+							(nutrition.fibers * nutrition.quantity).toFixed(2),
+						),
+						total_fats: parseFloat(
+							(nutrition.fats * nutrition.quantity).toFixed(2),
+						),
+						total_glucoses: parseFloat(
+							(nutrition.glucoses * nutrition.quantity).toFixed(2),
+						),
+						total_sodiums: parseFloat(
+							(nutrition.sodiums * nutrition.quantity).toFixed(2),
+						),
+						total_caliums: parseFloat(
+							(nutrition.caliums * nutrition.quantity).toFixed(2),
+						),
 					};
 				},
 			);
