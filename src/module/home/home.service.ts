@@ -29,14 +29,17 @@ export class HomeService {
 
 	constructor(private readonly GetModel: GetModel) {}
 
-	async foodAndQuantity(recordedNutrition: Object[], meal_time: Mealtime) {
+	async foodAndQuantity(recordedNutrition: any[], meal_time: Mealtime) {
 		return recordedNutrition
 			.filter((food: { meal_time: Mealtime }) => {
 				return food.meal_time == meal_time;
 			})
 			.map(
-				(food: {
+				(nutrition: {
+					food_id: number;
+					id: number;
 					name: string;
+					serving_size: string;
 					cals: number;
 					quantity: number;
 					carbos: number;
@@ -48,15 +51,19 @@ export class HomeService {
 					caliums: number;
 				}) => {
 					return {
-						name: food.name,
-						total_cals: food.cals * food.quantity,
-						total_carbos: food.carbos * food.quantity,
-						total_proteins: food.proteins * food.quantity,
-						total_fibers: food.fibers * food.quantity,
-						total_fats: food.fats * food.quantity,
-						total_glucoses: food.glucoses * food.quantity,
-						total_sodiums: food.sodiums * food.quantity,
-						total_caliums: food.caliums * food.quantity,
+						food_id: nutrition.food_id,
+						nutrition_id: nutrition.id,
+						name: nutrition.name,
+						serving_size: nutrition.serving_size,
+						quantity: nutrition.quantity,
+						total_cals: nutrition.cals * nutrition.quantity,
+						total_carbos: nutrition.carbos * nutrition.quantity,
+						total_proteins: nutrition.proteins * nutrition.quantity,
+						total_fibers: nutrition.fibers * nutrition.quantity,
+						total_fats: nutrition.fats * nutrition.quantity,
+						total_glucoses: nutrition.glucoses * nutrition.quantity,
+						total_sodiums: nutrition.sodiums * nutrition.quantity,
+						total_caliums: nutrition.caliums * nutrition.quantity,
 					};
 				},
 			);
@@ -119,6 +126,7 @@ export class HomeService {
 				acc[packet_name].foods.push({
 					id: food_id,
 					name: food_name,
+					cals: total_cals,
 				});
 
 				return acc;
@@ -238,6 +246,8 @@ export class HomeService {
 				Mealtime.BREAKFAST,
 			);
 
+			// return breakfast;
+
 			const lunch = await this.foodAndQuantity(
 				recordedNutrition,
 				Mealtime.LUNCH,
@@ -251,20 +261,53 @@ export class HomeService {
 			const recordFoods = {
 				breakfast: breakfast.map(val => {
 					return {
+						food_id: val.food_id,
+						nutrition_id: val.nutrition_id,
 						name: val.name,
-						cals: val.total_cals,
+						serving_size: val.serving_size,
+						quantity: val.quantity,
+						total_cals: val.total_cals,
+						total_carbos: val.total_carbos,
+						total_proteins: val.total_proteins,
+						total_fats: val.total_fats,
+						total_fibers: val.total_fibers,
+						total_caliums: val.total_caliums,
+						total_sodiums: val.total_sodiums,
+						total_glucoses: val.total_glucoses,
 					};
 				}),
 				lunch: lunch.map(val => {
 					return {
+						food_id: val.food_id,
+						nutrition_id: val.nutrition_id,
 						name: val.name,
-						cals: val.total_cals,
+						serving_size: val.serving_size,
+						quantity: val.quantity,
+						total_cals: val.total_cals,
+						total_carbos: val.total_carbos,
+						total_proteins: val.total_proteins,
+						total_fats: val.total_fats,
+						total_fibers: val.total_fibers,
+						total_caliums: val.total_caliums,
+						total_sodiums: val.total_sodiums,
+						total_glucoses: val.total_glucoses,
 					};
 				}),
 				dinner: dinner.map(val => {
 					return {
+						food_id: val.food_id,
+						nutrition_id: val.nutrition_id,
 						name: val.name,
-						cals: val.total_cals,
+						serving_size: val.serving_size,
+						quantity: val.quantity,
+						total_cals: val.total_cals,
+						total_carbos: val.total_carbos,
+						total_proteins: val.total_proteins,
+						total_fats: val.total_fats,
+						total_fibers: val.total_fibers,
+						total_caliums: val.total_caliums,
+						total_sodiums: val.total_sodiums,
+						total_glucoses: val.total_glucoses,
 					};
 				}),
 			};
@@ -361,9 +404,9 @@ export class HomeService {
 				record_foods: recordFoods,
 				record_water: recordWater,
 				food_suggestion: {
-					sarapan: breakfastSuggestion,
-					makan_siang: lunchSuggestion,
-					makan_malam: dinnerSuggestion,
+					breakfast: breakfastSuggestion,
+					lunch: lunchSuggestion,
+					dinner: dinnerSuggestion,
 				},
 			};
 		} catch (error) {
