@@ -25,7 +25,7 @@ jobs:
           GOOGLE_PROJECT: ${{ secrets.PROJECT_ID_PROD }}
         run: |
           gcloud auth configure-docker ${{ secrets.GOOGLE_AUTH }}
-          docker build -t ${{ secrets.ARTIFACT_REGISTRY }}/${{ secrets.SERVICE_NAME }} .
+          docker build -t ${{ secrets.ARTIFACT_REGISTRY_PROD }}/${{ secrets.SERVICE_NAME }} .
           docker push ${{ secrets.ARTIFACT_REGISTRY }}/${{ secrets.SERVICE_NAME }}
 
       - name: Deploy to Cloud Run
