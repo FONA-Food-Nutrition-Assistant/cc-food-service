@@ -1,4 +1,4 @@
-name: Deploy Food Service to Cloud Run
+name: Development | Deploy Food Service to Cloud Run
 
 on:
   push:
