@@ -56,7 +56,7 @@ export class GetModel {
 			'np',
 		)
 			.select(
-				'p.id, p.name as packet_name, f.id as food_id, f.name as food_name, p.total_cals',
+				'p.id, p.name as packet_name, f.id as food_id, f.name as food_name, p.total_cals, p.image_url as image_url',
 			)
 			.leftJoin(PacketEntity, 'p', 'p.id = np.packet_id')
 			.leftJoin(NutritionEntity, 'n', 'n.id = np.nutrition_id')
@@ -71,7 +71,7 @@ export class GetModel {
 
 		let query_lunch = this.NutritionPacketRepository.createQueryBuilder('np')
 			.select(
-				'p.id, p.name as packet_name, f.id as food_id, f.name as food_name, p.total_cals',
+				'p.id, p.name as packet_name, f.id as food_id, f.name as food_name, p.total_cals, p.image_url as image_url',
 			)
 			.leftJoin(PacketEntity, 'p', 'p.id = np.packet_id')
 			.leftJoin(NutritionEntity, 'n', 'n.id = np.nutrition_id')
@@ -86,7 +86,7 @@ export class GetModel {
 
 		let query_dinner = this.NutritionPacketRepository.createQueryBuilder('np')
 			.select(
-				'p.id, p.name as packet_name, f.id as food_id, f.name as food_name, p.total_cals',
+				'p.id, p.name as packet_name, f.id as food_id, f.name as food_name, p.total_cals, p.image_url as image_url',
 			)
 			.leftJoin(PacketEntity, 'p', 'p.id = np.packet_id')
 			.leftJoin(NutritionEntity, 'n', 'n.id = np.nutrition_id')

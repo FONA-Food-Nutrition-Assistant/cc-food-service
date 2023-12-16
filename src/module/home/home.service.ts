@@ -21,6 +21,7 @@ type query = {
 	total_cals: number;
 	id: number;
 	food_id: number;
+	image_url: string;
 };
 
 @Injectable()
@@ -126,12 +127,14 @@ export class HomeService {
 	async convertArrayOfObject(query: Array<query>) {
 		return Object.values(
 			query.reduce((acc, curr) => {
-				const { packet_name, food_name, total_cals, id, food_id } = curr;
+				const { packet_name, food_name, total_cals, id, food_id, image_url } =
+					curr;
 
 				if (!acc[packet_name]) {
 					acc[packet_name] = {
 						id,
 						name: packet_name,
+						image_url,
 						total_cals: total_cals,
 						foods: [],
 					};
