@@ -23,25 +23,66 @@ jobs:
       - name: Build and Push the Docker Image
         env:
           GOOGLE_PROJECT: ${{ secrets.PROJECT_ID }}
+          GOOGLE_AUTH: ${{ secrets.GOOGLE_AUTH }}
+          ARTIFACT_REGISTRY: ${{ secrets.ARTIFACT_REGISTRY }}
+          SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
         run: |
-          gcloud auth configure-docker ${{ secrets.GOOGLE_AUTH }}
-          docker build -t ${{ secrets.ARTIFACT_REGISTRY }}/${{ secrets.SERVICE_NAME }} .
-          docker push ${{ secrets.ARTIFACT_REGISTRY }}/${{ secrets.SERVICE_NAME }}
+          gcloud auth configure-docker ${GOOGLE_AUTH}
+          docker build -t ${ARTIFACT_REGISTRY}/${SERVICE_NAME} .
+          docker push ${ARTIFACT_REGISTRY}/${SERVICE_NAME}
 
       - name: Deploy to Cloud Run
         env:
           GOOGLE_PROJECT: ${{ secrets.PROJECT_ID }}
+          ARTIFACT_REGISTRY: ${{ secrets.ARTIFACT_REGISTRY }}
+          SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
+          SERVICE_REVISION: ${{ secrets.SERVICE_VERSION }}
+          SERVICE_VERSION: ${{ secrets.SERVICE_VERSION }}
+          SERVICE_ENV: ${{ secrets.SERVICE_ENV }}
+          SERVICE_HOST: ${{ secrets.SERVICE_HOST }}
+          SERVICE_PORT: ${{ secrets.SERVICE_PORT }}
+          SERVICE_PREFIX: ${{ secrets.SERVICE_PREFIX }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
+          SERVICE_REGION: ${{ secrets.SERVICE_REGION }}
         run: |
-          gcloud run deploy ${{ secrets.SERVICE_NAME }} --image="${{ secrets.ARTIFACT_REGISTRY }}/${{ secrets.SERVICE_NAME }}:${{ secrets.SERVICE_VERSION }}" --set-env-vars="NODE_ENV=${{ secrets.SERVICE_ENV }}" --set-env-vars="APP_HOST=${{ secrets.SERVICE_HOST }}" --set-env-vars="APP_PORT=${{ secrets.SERVICE_PORT }}" --set-env-vars="APP_PREFIX=${{ secrets.SERVICE_PREFIX }}" --set-env-vars="DB_HOST=${{ secrets.DB_HOST }}" --set-env-vars="DB_PORT=${{ secrets.DB_PORT }}" --set-env-vars="DB_NAME=${{ secrets.DB_NAME }}" --set-env-vars="DB_USER=${{ secrets.DB_USER }}" --set-env-vars="DB_PASS=${{ secrets.DB_PASS }}" --set-env-vars="REDIS_HOST=${{ secrets.REDIS_HOST }}" --set-env-vars="REDIS_PORT=${{ secrets.REDIS_PORT }}" --region="${{ secrets.SERVICE_REGION }}" --project="${{ secrets.PROJECT_ID }}"
+          gcloud run deploy ${SERVICE_NAME} \
+          --image="${ARTIFACT_REGISTRY}/${SERVICE_NAME}:${SERVICE_VERSION}" \
+          --set-env-vars="NODE_ENV=${SERVICE_ENV},APP_HOST=${SERVICE_HOST},APP_PORT=${SERVICE_PORT},APP_PREFIX=${SERVICE_PREFIX},DB_HOST=${DB_HOST},DB_PORT=${DB_PORT},DB_NAME=${DB_NAME},DB_USER=${DB_USER},DB_PASS=${DB_PASS},REDIS_HOST=${REDIS_HOST},REDIS_PORT=${REDIS_PORT}" \
+          --region="${SERVICE_REGION}" \
+          --project="${GOOGLE_PROJECT}"
 
       - name: Update Cloud Run Traffic
         env:
           GOOGLE_PROJECT: ${{ secrets.PROJECT_ID }}
+          SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
+          SERVICE_REGION: ${{ secrets.SERVICE_REGION }}
         run: |
-          gcloud run services update-traffic ${{ secrets.SERVICE_NAME }} --region="${{ secrets.SERVICE_REGION }}" --to-latest
+          gcloud run services update-traffic ${SERVICE_NAME} --region="${SERVICE_REGION}" --to-latest
 
       - name: Push to Discord Webhook
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_USERNAME: ${{ secrets.DISCORD_WEBHOOK_USERNAME }}
+          DISCORD_WEBHOOK_AVATAR_URL: ${{ secrets.DISCORD_WEBHOOK_AVATAR_URL }}
+          SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          SERVICE_ENV: ${{ secrets.SERVICE_ENV }}
+          SERVICE_HOST: ${{ secrets.SERVICE_HOST }}
+          SERVICE_PORT: ${{ secrets.SERVICE_PORT }}
+          SERVICE_PREFIX: ${{ secrets.SERVICE_PREFIX }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
+
         run: |
-          IFS=$' \t\r\n' curl -H "Content-Type: application/json" -X POST -d '{"username": "${{ secrets.DISCORD_WEBHOOK_USERNAME }}","avatar_url": "${{ secrets.DISCORD_WEBHOOK_AVATAR_URL }}","embeds": [{"title": "Service Deployed: '${{ secrets.SERVICE_NAME }}'","description": "Service '${{ secrets.SERVICE_NAME }}' has been updated to the latest revision\nTraffic has been routed to the latest revision\n\n**Project ID**: `'${{ secrets.PROJECT_ID }}'`\n**NODE_ENV**: `'${{ secrets.SERVICE_ENV }}'`\n**APP_HOST**: `'${{ secrets.SERVICE_HOST }}'`\n**APP_PORT**: `'${{ secrets.SERVICE_PORT }}'`\n**APP_PREFIX**: `'${{ secrets.SERVICE_PREFIX }}'`\n**DB_HOST**: `'${{ secrets.DB_HOST }}'`\n**DB_PORT**: `'${{ secrets.DB_PORT }}'`\n**DB_NAME**: `'${{ secrets.DB_NAME }}'`\n**DB_USER**: `'${{ secrets.DB_USER }}'`\n**REDIS_HOST**: `'${{ secrets.REDIS_HOST }}'`\n**REDIS_PORT**: `'${{ secrets.REDIS_PORT }}'`\n", "color": 65280}]}' '${{ secrets.DISCORD_WEBHOOK_URL }}'
+          IFS=$' \t\r\n' curl -H "Content-Type: application/json" -X POST -d '{"username": "${DISCORD_WEBHOOK_USERNAME}","avatar_url": "${DISCORD_WEBHOOK_AVATAR_URL}","embeds": [{"title": "Service Deployed: '${SERVICE_NAME}'","description": "Service '${SERVICE_NAME}' has been updated to the latest revision\nTraffic has been routed to the latest revision\n\n**Project ID**: `'${PROJECT_ID}'`\n**NODE_ENV**: `'${SERVICE_ENV}'`\n**APP_HOST**: `'${SERVICE_HOST}'`\n**APP_PORT**: `'${SERVICE_PORT}'`\n**APP_PREFIX**: `'${SERVICE_PREFIX}'`\n**DB_HOST**: `'${DB_HOST}'`\n**DB_PORT**: `'${DB_PORT}'`\n**DB_NAME**: `'${DB_NAME}'`\n**DB_USER**: `'${DB_USER}'`\n**REDIS_HOST**: `'${REDIS_HOST}'`\n**REDIS_PORT**: `'${REDIS_PORT}'`\n", "color": 65280}]}' '${DISCORD_WEBHOOK_URL}'
