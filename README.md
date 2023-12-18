@@ -111,10 +111,13 @@
 | `enums`        | Houses enumerations, defining sets of named constant values           |
 | `exceptions`   | Stores custom exception classes or error handling functionalities.    |
 | `interceptors` | Holds code for intercepting and manipulating HTTP requests/responses. |
+| `messages`     | Contains messages for error handling purposes                         |
+| `middleware`   | Contains middleware for authentication and logging                    |
 | `DTOs`         | Stores Data Transfer Objects used for communication between layers.   |
+| `entites`      | Houses core business objects representing data structures.            |
 | `models`       | Contains data models representing entities within the service         |
 | `helpers`      | Houses utility functions or classes                                   |
 
 ## Deployment Stages
 
-![Alt text](image-3.png)
+![Deployment Stages](image-3.png)
