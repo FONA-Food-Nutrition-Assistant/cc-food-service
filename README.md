@@ -1,10 +1,10 @@
 # 🔗 FONA's Food Service
 
-`This food service provides a comprehensive suite of tools for users to manage their nutrition effectively.`
+`This food service provides a comprehensive suite of tools for users to record and manage their consumed foods and water.`
 
-💡 This service revolves around comprehensive food data, empowering users with detailed nutrition facts. Effortless recording of food and water intake helps users grasp their eating habits. Personalized meal suggestions cater to unique preferences and goals.
+💡 The `main idea` of this service is to allow users to record their consumed foods and water, and calculate the nutritions of their foods.
 
-🎯 We aim to empower users in making informed nutritional decisions. Our platform educates and facilitates easy tracking for healthier choices.
+🎯 The primary goal of this service is to calculate the nutritions of users recorded consumed foods
 
 ## Features
 
