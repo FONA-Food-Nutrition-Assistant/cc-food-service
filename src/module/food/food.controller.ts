@@ -8,7 +8,6 @@ import {
 	HttpStatus,
 	Headers,
 	Query,
-	Delete,
 } from '@nestjs/common';
 // import { FastifyReply } from 'fastify';
 
@@ -23,7 +22,6 @@ import { RequestListFoodDto } from './dto/list-food.dto';
 import { RequestListNutritionDto } from './dto/list-nutrition.dto';
 import { RequestFoodDetailDto } from './dto/food-detail.dto';
 import { RequestCreateRecordFoodDto } from './dto/create-record-food.dto';
-import { RequestDeleteRecordFoodDto } from './dto/delete-record-food.dto';
 
 @Controller('food')
 export class FoodController {
@@ -67,16 +65,6 @@ export class FoodController {
 		params.prepParams(uid);
 		const data = await this.foodService.updateRecordFood(params);
 		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_UPDATE, data);
-	}
-
-	@Delete()
-	async deleteRecordFood(
-		@Body() params: RequestDeleteRecordFoodDto,
-		@Headers('fona-client-uid') uid: string,
-	) {
-		params.prepParams(uid);
-		const data = await this.foodService.deleteRecordFood(params);
-		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_DELETE, []);
 	}
 
 	@Get('nutrition')

@@ -13,7 +13,6 @@ import { FoodAllergyEntity } from '../entities/food-allergy.entity';
 import { UserAllergyEntity } from '../entities/user-allergy.entity';
 import { AllergyEntity } from '../entities/allergy.entity';
 import { RequestUpdateRecordFoodDto } from '../dto/update-record-food.dto';
-import { RequestDeleteRecordFoodDto } from '../dto/delete-record-food.dto';
 
 @Injectable()
 export class GetModel {
@@ -84,19 +83,6 @@ export class GetModel {
 	async checkRegisteredNutrition(params: RequestUpdateRecordFoodDto) {
 		const query = this.UserNutritionRepository.createQueryBuilder()
 			.where('user_id = :uid', { uid: params.uid })
-			.andWhere('date = :date', { date: params.date })
-			.andWhere('meal_time = :meal_time', { meal_time: params.meal_time });
-
-		return await query.getRawOne();
-	}
-
-	async checkRegisteredNutritionForDelete(
-		params: RequestDeleteRecordFoodDto,
-		nutrition_id: number,
-	) {
-		const query = this.UserNutritionRepository.createQueryBuilder()
-			.where('user_id = :uid', { uid: params.uid })
-			.andWhere('nutrition_id = :nutrition_id', { nutrition_id: nutrition_id })
 			.andWhere('date = :date', { date: params.date })
 			.andWhere('meal_time = :meal_time', { meal_time: params.meal_time });
 
