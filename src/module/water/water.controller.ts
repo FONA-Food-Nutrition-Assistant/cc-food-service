@@ -6,6 +6,7 @@ import {
 	Put,
 	HttpStatus,
 	Headers,
+	Delete,
 } from '@nestjs/common';
 // import { FastifyReply } from 'fastify';
 
@@ -17,6 +18,7 @@ import { WaterService } from './water.service';
 /* DTO */
 import { RequestCreateRecordWaterDto } from './dto/create-water.dto';
 import { RequestUpdateRecordWaterDto } from './dto/update-water.dto';
+import { RequestDeleteRecordWaterDto } from './dto/delete-water.dto';
 
 @Controller('water')
 export class WaterController {
@@ -40,5 +42,15 @@ export class WaterController {
 		params.prepParams(uid);
 		const data = await this.WaterService.updateRecordWater(params);
 		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_UPDATE, data);
+	}
+
+	@Delete()
+	async deleteWater(
+		@Body() params: RequestDeleteRecordWaterDto,
+		@Headers('fona-client-uid') uid: string,
+	) {
+		params.prepParams(uid);
+		const data = await this.WaterService.deleteRecordWater(params);
+		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_DELETE, data);
 	}
 }
