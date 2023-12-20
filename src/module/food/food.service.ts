@@ -24,6 +24,7 @@ import {
 } from './dto/create-record-food.dto';
 import { runInTransaction } from '../../db/run-in-transaction';
 import { DataSource } from 'typeorm';
+import { RequestDeleteRecordFoodDto } from './dto/delete-record-food.dto';
 
 @Injectable()
 export class FoodService {
@@ -150,6 +151,33 @@ export class FoodService {
 				foods_contain_allergies: foodsContainAllergies,
 				data,
 			} as ResponseUpdateRecordFoodDto;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	async deleteRecordFood(params: RequestDeleteRecordFoodDto) {
+		try {
+			for (const nutrition_id of params.nutrition_ids) {
+				const checkRegisteredNutritions =
+					await this.GetModel.checkRegisteredNutritionForDelete(
+						params,
+						nutrition_id,
+					);
+
+				if (!checkRegisteredNutritions) {
+					throw new HttpException(
+						ResponseMessage.ERR_FOOD_DATA_HAS_NOT_BEEN_REGISTERED_FOR_DELETE,
+						HttpStatus.BAD_REQUEST,
+					);
+				}
+			}
+
+			params.nutrition_ids.forEach(async nutrition_id => {
+				await this.DeleteModel.deleteUserNutritionByIds(params, nutrition_id);
+			});
+
+			return 'User Record Foods has been deleted';
 		} catch (error) {
 			throw error;
 		}
