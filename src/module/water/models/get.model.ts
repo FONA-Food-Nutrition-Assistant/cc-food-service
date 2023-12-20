@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { WaterEntity } from '../entities/water.entity';
 import { RequestCreateRecordWaterDto } from '../dto/create-water.dto';
 import { RequestUpdateRecordWaterDto } from '../dto/update-water.dto';
+import { RequestDeleteRecordWaterDto } from '../dto/delete-water.dto';
 
 @Injectable()
 export class GetModel {
@@ -13,7 +14,10 @@ export class GetModel {
 	) {}
 
 	async checkRegisteredWater(
-		params: RequestCreateRecordWaterDto | RequestUpdateRecordWaterDto,
+		params:
+			| RequestCreateRecordWaterDto
+			| RequestUpdateRecordWaterDto
+			| RequestDeleteRecordWaterDto,
 	) {
 		let query = this.WaterRepository.createQueryBuilder()
 			.select('*')
