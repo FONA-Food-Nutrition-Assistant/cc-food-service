@@ -6,6 +6,7 @@ import { WaterEntity } from './entities/water.entity';
 import { PostModel } from './models/post.model';
 import { PutModel } from './models/put.model';
 import { GetModel } from './models/get.model';
+import { DeleteModel } from './models/delete.model';
 
 @Module({
 	imports: [TypeOrmModule.forFeature([WaterEntity])],
@@ -18,6 +19,7 @@ import { GetModel } from './models/get.model';
 		PostModel,
 		PutModel,
 		GetModel,
+		DeleteModel,
 	],
 })
 export class WaterModule {}
