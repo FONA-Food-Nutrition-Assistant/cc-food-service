@@ -24,6 +24,7 @@ import {
 } from './dto/create-record-food.dto';
 import { runInTransaction } from '../../db/run-in-transaction';
 import { DataSource } from 'typeorm';
+import { RequestDeleteRecordFoodDto } from './dto/delete-record-food.dto';
 
 @Injectable()
 export class FoodService {
@@ -120,36 +121,68 @@ export class FoodService {
 
 	async updateRecordFood(params: RequestUpdateRecordFoodDto) {
 		try {
-			const checkRegisteredNutritions =
-				await this.GetModel.checkRegisteredNutrition(params);
+			return await runInTransaction(this.dataSource, async em => {
+				const checkRegisteredNutritions =
+					await this.GetModel.checkRegisteredNutrition(params);
 
-			if (!checkRegisteredNutritions) {
-				throw new HttpException(
-					ResponseMessage.ERR_FOOD_DATA_HAS_NOT_BEEN_REGISTERED,
-					HttpStatus.BAD_REQUEST,
-				);
-			}
+				if (!checkRegisteredNutritions) {
+					throw new HttpException(
+						ResponseMessage.ERR_FOOD_DATA_HAS_NOT_BEEN_REGISTERED,
+						HttpStatus.BAD_REQUEST,
+					);
+				}
 
-			await this.DeleteModel.deleteUserNutritions(params);
+				await this.DeleteModel.deleteUserNutritions(params, em);
 
-			const data = await this.PutModel.updateFood(params);
+				const data = await this.PutModel.updateFood(params, em);
 
-			const foods = params.foods.map(food => food.nutrition_id);
+				const foods = params.foods.map(food => food.nutrition_id);
 
-			let foodsContainAllergies = await this.GetModel.checkNutritionsAllergies(
-				foods,
-				params.uid,
-			);
+				let foodsContainAllergies =
+					await this.GetModel.checkNutritionsAllergies(foods, params.uid);
 
-			foodsContainAllergies = foodsContainAllergies.map(val => val.food);
+				foodsContainAllergies = foodsContainAllergies.map(val => val.food);
 
-			const isFoodsContainAllergies = foodsContainAllergies.length > 0 || false;
+				const isFoodsContainAllergies =
+					foodsContainAllergies.length > 0 || false;
 
-			return {
-				is_foods_contain_allergies: isFoodsContainAllergies,
-				foods_contain_allergies: foodsContainAllergies,
-				data,
-			} as ResponseUpdateRecordFoodDto;
+				return {
+					is_foods_contain_allergies: isFoodsContainAllergies,
+					foods_contain_allergies: foodsContainAllergies,
+					data,
+				} as ResponseUpdateRecordFoodDto;
+			});
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	async deleteRecordFood(params: RequestDeleteRecordFoodDto) {
+		try {
+			return await runInTransaction(this.dataSource, async em => {
+				for (const nutrition_id of params.nutrition_ids) {
+					const checkRegisteredNutritions =
+						await this.GetModel.checkRegisteredNutritionForDelete(
+							params,
+							nutrition_id,
+						);
+
+					if (!checkRegisteredNutritions) {
+						throw new HttpException(
+							ResponseMessage.ERR_FOOD_DATA_HAS_NOT_BEEN_REGISTERED_FOR_DELETE,
+							HttpStatus.BAD_REQUEST,
+						);
+					}
+
+					await this.DeleteModel.deleteUserNutritionByIds(
+						params,
+						nutrition_id,
+						em,
+					);
+				}
+
+				return 'User Record Foods has been deleted';
+			});
 		} catch (error) {
 			throw error;
 		}
